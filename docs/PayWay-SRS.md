@@ -3,7 +3,7 @@
 ## Software Requirements Specification (SRS)
 
 Version: 1.0
- Author: Yasir Alizai
+ Author: Yasir Azizi
  Date: March 2026
 
 ------
