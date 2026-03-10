@@ -22,11 +22,15 @@ async function login() {
     // Parse JSON response
     const data = await response.json();
 
+    const messageDiv = document.getElementById('login-message');
+
     // Handle successful login
     if (response.ok) {
-        alert('Login successful');
+        messageDiv.innerText = 'Login successful';
+        // redirect to dashboard
+        window.location.href = 'dashboard.html';
     } else {
         // Display error message from server
-        alert(data.message);
+        messageDiv.innerText = data.message;
     }
 }

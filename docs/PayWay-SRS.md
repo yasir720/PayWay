@@ -3,10 +3,10 @@
 ## Software Requirements Specification (SRS)
 
 Version: 1.0
- Author: Yasir Azizi
- Date: March 2026
+Author: Yasir Azizi
+Date: March 2026
 
-------
+---
 
 # 1. Introduction
 
@@ -16,7 +16,7 @@ This document describes the functional and non-functional requirements for **Pay
 
 The system will allow authorized users to manage salary records, monitor employee compensation history, and apply salary adjustments based on defined performance metrics. PayWay will enforce role-based access control and maintain audit logs for critical system actions.
 
-------
+---
 
 ## 1.2 Scope
 
@@ -33,17 +33,17 @@ The system will provide functionality for:
 
 PayWay will be used primarily by employees, HR personnel, and system administrators.
 
-------
+---
 
 ## 1.3 Stakeholders
 
-| Stakeholder           | Description                                                  |
-| --------------------- | ------------------------------------------------------------ |
-| Employees             | View their personal salary and PTO information               |
+| Stakeholder           | Description                                                          |
+| --------------------- | -------------------------------------------------------------------- |
+| Employees             | View their personal salary and PTO information                       |
 | HR Personnel          | Manage employee records, salary adjustments, hiring, and termination |
-| System Administrators | Manage user accounts, permissions, and system configuration  |
+| System Administrators | Manage user accounts, permissions, and system configuration          |
 
-------
+---
 
 # 2. System Overview
 
@@ -53,7 +53,7 @@ The system will enforce strict security controls to protect sensitive payroll in
 
 PayWay will also maintain historical records of salary changes to ensure transparency and accountability.
 
-------
+---
 
 # 3. Functional Requirements
 
@@ -66,13 +66,13 @@ Requirements:
 - The system shall store employee salary data in a centralized database.
 - The system shall allow users to view salary records.
 - The system shall allow salary information to be sorted and filtered by:
-  - Department
-  - Hire date
-  - Salary amount (highest to lowest)
-  - Salary amount (lowest to highest)
+    - Department
+    - Hire date
+    - Salary amount (highest to lowest)
+    - Salary amount (lowest to highest)
 - The system shall allow employees to view their own salary and salary history.
 
-------
+---
 
 ## 3.2 Salary Adjustment System
 
@@ -83,11 +83,11 @@ Requirements:
 - The system shall allow salary raises to be calculated using employee performance metrics.
 - The system shall support department-based salary comparisons.
 - The system shall allow HR personnel to apply raises such that:
-  - The top three employees in each department receive a **5% salary increase**
-  - All remaining employees receive a **3% salary increase**
+    - The top three employees in each department receive a **5% salary increase**
+    - All remaining employees receive a **3% salary increase**
 - The system shall store a historical record of all salary adjustments.
 
-------
+---
 
 ## 3.3 Employee Lifecycle Management
 
@@ -98,13 +98,13 @@ Requirements:
 - The system shall allow HR personnel to add new employee records.
 - The system shall allow HR personnel to terminate employee records.
 - The system shall track:
-  - Employee hire dates
-  - Employee termination dates
+    - Employee hire dates
+    - Employee termination dates
 - The system shall allow HR personnel to manage payroll-related records including:
-  - Paid time off (PTO)
-  - Payroll deductions
+    - Paid time off (PTO)
+    - Payroll deductions
 
-------
+---
 
 ## 3.4 Role-Based Access Control
 
@@ -120,7 +120,7 @@ Employees shall be able to:
 
 Employees shall not be permitted to modify salary or employee data.
 
-------
+---
 
 ### HR Role
 
@@ -134,7 +134,7 @@ HR personnel shall be able to:
 
 HR personnel shall not be permitted to modify salary records older than three months.
 
-------
+---
 
 ### Administrator Role
 
@@ -145,7 +145,7 @@ Administrators shall be able to:
 - Modify salary records beyond the HR modification window
 - Manage system configuration settings
 
-------
+---
 
 # 4. Security Requirements
 
@@ -158,7 +158,7 @@ Requirements:
 - The system shall require confirmation prompts before major salary changes are finalized.
 - The system shall generate alerts when unusually large salary changes occur.
 
-------
+---
 
 # 5. Logging and Auditing
 
@@ -178,7 +178,7 @@ Each log entry shall include:
 - Description of the change
 - Affected system entity
 
-------
+---
 
 # 6. Non-Functional Requirements
 
@@ -186,25 +186,25 @@ Each log entry shall include:
 
 The system shall efficiently process salary queries, employee searches, and department-level salary comparisons.
 
-------
+---
 
 ## 6.2 Security
 
 Sensitive payroll information shall be protected using authentication, authorization, and secure storage mechanisms.
 
-------
+---
 
 ## 6.3 Reliability
 
 The system shall maintain accurate records of employee salary and compensation data.
 
-------
+---
 
 ## 6.4 Maintainability
 
 The system should be designed in a modular manner to allow future enhancements and system updates.
 
-------
+---
 
 # 7. Use Cases
 
@@ -213,7 +213,7 @@ The system should be designed in a modular manner to allow future enhancements a
 Actor: Employee
 
 Description:
- An employee views their salary information and salary history.
+An employee views their salary information and salary history.
 
 Steps:
 
@@ -222,7 +222,7 @@ Steps:
 3. Employee navigates to the salary dashboard
 4. System displays salary data
 
-------
+---
 
 ## UC-2: View PTO Balance
 
@@ -235,7 +235,7 @@ Steps:
 3. System retrieves PTO records
 4. System displays available PTO
 
-------
+---
 
 ## UC-3: Add New Employee
 
@@ -249,7 +249,7 @@ Steps:
 4. System validates the information
 5. System creates a new employee record
 
-------
+---
 
 ## UC-4: Update Employee Salary
 
@@ -263,7 +263,7 @@ Steps:
 4. System requests confirmation
 5. System saves the salary update
 
-------
+---
 
 ## UC-5: Apply Performance Raises
 
@@ -275,11 +275,11 @@ Steps:
 2. System ranks employees by performance score
 3. System identifies the top three employees
 4. System applies raises:
-   - 5% increase to top three employees
-   - 3% increase to remaining employees
+    - 5% increase to top three employees
+    - 3% increase to remaining employees
 5. System records salary adjustment history
 
-------
+---
 
 ## UC-6: Manage User Accounts
 
@@ -292,7 +292,7 @@ Steps:
 3. Administrator creates, modifies, or deletes accounts
 4. System logs account changes
 
-------
+---
 
 # 8. User Stories
 
@@ -301,49 +301,49 @@ Steps:
 **Story 1**
 
 As an employee
- I want to view my salary history
- So that I can track changes to my compensation.
+I want to view my salary history
+So that I can track changes to my compensation.
 
-------
+---
 
 **Story 2**
 
 As an employee
- I want to see my PTO balance
- So that I know how many days off I can take.
+I want to see my PTO balance
+So that I know how many days off I can take.
 
-------
+---
 
 ### HR Personnel
 
 **Story 3**
 
 As an HR user
- I want to add new employees
- So that their information is stored in PayWay.
+I want to add new employees
+So that their information is stored in PayWay.
 
-------
+---
 
 **Story 4**
 
 As an HR user
- I want to update employee salaries within a limited timeframe
- So that payroll errors can be corrected.
+I want to update employee salaries within a limited timeframe
+So that payroll errors can be corrected.
 
-------
+---
 
 **Story 5**
 
 As an HR user
- I want to apply raises automatically
- So that salary increases are applied consistently across departments.
+I want to apply raises automatically
+So that salary increases are applied consistently across departments.
 
-------
+---
 
 ### Administrator
 
 **Story 6**
 
 As an administrator
- I want to manage user roles
- So that the correct users have appropriate system permissions.
+I want to manage user roles
+So that the correct users have appropriate system permissions.
