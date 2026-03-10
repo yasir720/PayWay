@@ -7,20 +7,51 @@
     <link rel="stylesheet" href="css/dashboard_style.css" />
 </head>
 <body>
-    <div class="dashboard-container">
-        <h2>Employee Dashboard</h2>
-        <table id="employee-table">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Department</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
+    <header class="dashboard-header">
+    <h2>PayWay Dashboard</h2>
+
+    <nav>
+        <button onclick="showEmployees()">Employee Data</button>
+        <button onclick="showSalaries()">Salary Data</button>
+    </nav>
+</header>
+
+   <section id="employee-section">
+    <h3>Employees</h3>
+
+    <button id="raise-btn" onclick="applyRaises()">
+        Apply Department Raises
+    </button>
+
+    <table id="employee-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Department</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody></tbody>
+    </table>
+</section>
+
+<section id="salary-section" style="display:none;">
+    <h3>Salaries</h3>
+
+    <table id="salary-table">
+        <thead>
+            <tr>
+                <th>Employee</th>
+                <th>Salary</th>
+                <th>Effective Date</th>
+            </tr>
+        </thead>
+
+        <tbody></tbody>
+    </table>
+</section>
 
     <script src="./js/dashboard.js"></script>
 </body>
