@@ -9,7 +9,6 @@ $role = $_SESSION['role_id'];
 $employee_id = $_SESSION['employee_id'];
 
 if ($role == 1) {
-
     $stmt = $pdo->prepare("
         SELECT s.salary_amount, s.effective_date,
                e.first_name, e.last_name
@@ -20,9 +19,7 @@ if ($role == 1) {
     ");
 
     $stmt->execute(['id' => $employee_id]);
-
 } else {
-
     $stmt = $pdo->query("
         SELECT s.salary_amount, s.effective_date,
                e.first_name, e.last_name

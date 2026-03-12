@@ -30,7 +30,8 @@ table {
     margin-top: 20px;
 }
 
-th, td {
+th,
+td {
     text-align: left;
     padding: 12px;
     border-bottom: 1px solid #ddd;

@@ -25,17 +25,15 @@ async function loadEmployees() {
 }
 
 async function loadSalaries() {
-
-    const res = await fetch("../backend/api/salaries.php");
+    const res = await fetch('../backend/api/salaries.php');
     const salaries = await res.json();
 
-    const tbody = document.querySelector("#salary-table tbody");
+    const tbody = document.querySelector('#salary-table tbody');
 
-    tbody.innerHTML = "";
+    tbody.innerHTML = '';
 
-    salaries.forEach(s => {
-
-        const row = document.createElement("tr");
+    salaries.forEach((s) => {
+        const row = document.createElement('tr');
 
         row.innerHTML = `
             <td>${s.first_name} ${s.last_name}</td>
@@ -48,15 +46,14 @@ async function loadSalaries() {
 }
 
 async function applyRaises() {
-
     const confirmAction = confirm(
-        "Are you sure you want to apply department raises?"
+        'Are you sure you want to apply department raises?',
     );
 
     if (!confirmAction) return;
 
-    const res = await fetch("../backend/api/apply_raises.php", {
-        method: "POST"
+    const res = await fetch('../backend/api/apply_raises.php', {
+        method: 'POST',
     });
 
     const data = await res.json();
@@ -75,13 +72,13 @@ function editEmployee(id) {
 }
 
 function showEmployees() {
-    document.getElementById("employee-section").style.display = "block";
-    document.getElementById("salary-section").style.display = "none";
+    document.getElementById('employee-section').style.display = 'block';
+    document.getElementById('salary-section').style.display = 'none';
 }
 
 function showSalaries() {
-    document.getElementById("employee-section").style.display = "none";
-    document.getElementById("salary-section").style.display = "block";
+    document.getElementById('employee-section').style.display = 'none';
+    document.getElementById('salary-section').style.display = 'block';
     loadSalaries();
 }
 

@@ -10,12 +10,11 @@ $user_id = $_SESSION['user_id'];
 
 if ($role == 1) {
     http_response_code(403);
-    echo json_encode(["message" => "Employees cannot apply raises"]);
+    echo json_encode(['message' => 'Employees cannot apply raises']);
     exit();
 }
 
 try {
-
     $pdo->beginTransaction();
 
     /*
@@ -176,16 +175,14 @@ try {
     $pdo->commit();
 
     echo json_encode([
-        "message" => "Raises applied successfully and logged in salary_history"
+        'message' => 'Raises applied successfully and logged in salary_history',
     ]);
-
 } catch (Exception $e) {
-
     $pdo->rollBack();
 
     http_response_code(500);
 
     echo json_encode([
-        "message" => "Raise process failed"
+        'message' => 'Raise process failed',
     ]);
 }
