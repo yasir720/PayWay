@@ -12,7 +12,7 @@ async function loadEmployees() {
         row.innerHTML = `
             <td>${emp.first_name} ${emp.last_name}</td>
             <td>${emp.email}</td>
-            <td>${emp.department_id}</td>
+            <td>${emp.department_name}</td>
             <td>
                 <button onclick="editEmployee(${emp.employee_id})">
                     Edit
@@ -106,6 +106,75 @@ async function logout() {
     } catch (error) {
         console.error('Error:', error);
         alert('An error occurred while logging out.');
+    }
+}
+
+async function loadSalaries() {
+    const res = await fetch('../backend/api/salaries.php');
+    const data = await res.json();
+
+    const tbodyCurrent = document.querySelector('#salary-table tbody');
+    tbodyCurrent.innerHTML = '';
+
+    // Current salaries
+    data.current.forEach((s) => {
+        const row = document.createElement('tr');
+
+        row.innerHTML = `
+            <td>${s.first_name} ${s.last_name}</td>
+            <td>$${s.salary_amount}</td>
+            <td>${s.effective_date}</td>
+        `;
+
+        tbodyCurrent.appendChild(row);
+    });
+
+    // Remove old history table if it exists
+    let oldHistoryTable = document.querySelector('#salary-history-table');
+    if (oldHistoryTable) oldHistoryTable.remove();
+
+    // Only show history if there is data
+    if (data.history.length > 0) {
+        const section = document.getElementById('salary-section');
+
+        const historyTitle = document.createElement('h3');
+        historyTitle.textContent = 'Salary History';
+        section.appendChild(historyTitle);
+
+        const historyTable = document.createElement('table');
+        historyTable.id = 'salary-history-table';
+        historyTable.classList.add('data-table');
+
+        historyTable.innerHTML = `
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Old Salary</th>
+                    <th>New Salary</th>
+                    <th>Change %</th>
+                    <th>Change Date</th>
+                    <th>Reason</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        `;
+
+        section.appendChild(historyTable);
+
+        const tbodyHistory = historyTable.querySelector('tbody');
+
+        data.history.forEach((h) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${h.first_name} ${h.last_name}</td>
+                <td>$${h.old_salary}</td>
+                <td>$${h.new_salary}</td>
+                <td>${h.change_percent != null ? h.change_percent + '%' : ''}</td>
+                <td>${h.change_date}</td>
+                <td>${h.change_reason || ''}</td>
+            `;
+            tbodyHistory.appendChild(row);
+        });
     }
 }
 

@@ -9,21 +9,31 @@ $role = $_SESSION['role_id'];
 $employee_id = $_SESSION['employee_id'];
 
 if ($role == 1) {
-    // employee can only see themselves
-
     $stmt = $pdo->prepare("
-        SELECT *
-        FROM employees
-        WHERE employee_id = :employee_id
+        SELECT e.employee_id,
+               e.first_name,
+               e.last_name,
+               e.email,
+               d.department_name
+        FROM employees e
+        LEFT JOIN departments d 
+               ON e.department_id = d.department_id
+        WHERE e.employee_id = :employee_id
+          AND e.status = 'active'
     ");
 
     $stmt->execute(['employee_id' => $employee_id]);
 } else {
-    // HR and admin can see everyone
-
     $stmt = $pdo->prepare("
-        SELECT *
-        FROM employees
+        SELECT e.employee_id,
+               e.first_name,
+               e.last_name,
+               e.email,
+               d.department_name
+        FROM employees e
+        LEFT JOIN departments d 
+               ON e.department_id = d.department_id
+        WHERE e.status = 'active'
     ");
 
     $stmt->execute();
