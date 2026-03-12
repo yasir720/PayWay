@@ -11,6 +11,7 @@ if (!isset($_SESSION['user_id'])) {
     echo json_encode([
         'message' => 'Unauthorized',
     ]);
+    header('Location: /login.php'); // Adjust path if needed
     exit();
 }
 

@@ -1,30 +1,28 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>PayWay - Dashboard</title>
-        <link rel="stylesheet" href="css/dashboard_style.css" />
-        <link rel="icon" type="image/png" href="./images/favicon.ico">
-    </head>
-    <body>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PayWay - Dashboard</title>
+    <link rel="stylesheet" href="css/dashboard_style.css" />
+    <link rel="icon" type="image/png" href="./images/favicon.ico">
+</head>
+<body>
+    <div class="dashboard-container">
         <header class="dashboard-header">
             <h2>PayWay Dashboard</h2>
-
             <nav>
-                <button onclick="showEmployees()">Employee Data</button>
-                <button onclick="showSalaries()">Salary Data</button>
+                <button class="nav-btn" onclick="showEmployees()">Employee Data</button>
+                <button class="nav-btn" onclick="showSalaries()">Salary Data</button>
+                <button class="nav-btn" onclick="logout()">Logout</button>
             </nav>
         </header>
 
-        <section id="employee-section">
+        <section id="employee-section" class="section active">
             <h3>Employees</h3>
+            <button id="raise-btn" class="action-btn" onclick="applyRaises()">Apply Department Raises</button>
 
-            <button id="raise-btn" onclick="applyRaises()">
-                Apply Department Raises
-            </button>
-
-            <table id="employee-table">
+            <table id="employee-table" class="data-table">
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -33,15 +31,13 @@
                         <th>Action</th>
                     </tr>
                 </thead>
-
                 <tbody></tbody>
             </table>
         </section>
 
-        <section id="salary-section" style="display: none">
+        <section id="salary-section" class="section">
             <h3>Salaries</h3>
-
-            <table id="salary-table">
+            <table id="salary-table" class="data-table">
                 <thead>
                     <tr>
                         <th>Employee</th>
@@ -49,11 +45,11 @@
                         <th>Effective Date</th>
                     </tr>
                 </thead>
-
                 <tbody></tbody>
             </table>
         </section>
+    </div>
 
-        <script src="./js/dashboard.js"></script>
-    </body>
+    <script src="./js/dashboard.js"></script>
+</body>
 </html>

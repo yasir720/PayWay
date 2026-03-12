@@ -1,14 +1,14 @@
-/* Page background and font */
+/* ===== Page Styling ===== */
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f6f8;
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    padding-top: 50px; /* spacing for dashboard */
+    padding: 50px 0;
 }
 
-/* Dashboard container styling */
+/* ===== Dashboard Container ===== */
 .dashboard-container {
     background: #ffffff;
     padding: 40px;
@@ -17,31 +17,51 @@ body {
     width: 800px;
 }
 
-/* Headings */
-h2 {
+/* ===== Header ===== */
+.dashboard-header h2 {
     text-align: center;
     margin-bottom: 20px;
 }
 
-/* Table styling */
-table {
+.dashboard-header nav {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+/* ===== Sections ===== */
+.section {
+    display: none;
+}
+
+.section.active {
+    display: block;
+}
+
+/* ===== Tables ===== */
+.data-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
 }
 
-th,
-td {
+.data-table th,
+.data-table td {
     text-align: left;
     padding: 12px;
     border-bottom: 1px solid #ddd;
 }
 
-th {
+.data-table th {
     background-color: #f0f2f5;
 }
 
-/* Buttons */
+.data-table tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+/* ===== Buttons ===== */
 button {
     padding: 6px 12px;
     background-color: #2f80ed;
@@ -50,13 +70,18 @@ button {
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
+    transition: background-color 0.2s;
 }
 
 button:hover {
     background-color: #1366d6;
 }
 
-/* Optional: subtle hover effect on table rows */
-table tbody tr:hover {
-    background-color: #f9f9f9;
+/* Optional: separate button types for clarity */
+.nav-btn {
+    font-weight: bold;
+}
+
+.action-btn {
+    margin-bottom: 10px;
 }
