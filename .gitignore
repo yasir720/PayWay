@@ -1,6 +1,7 @@
 # CakePHP 3
 
-/vendor/*
+/vendor/
+/backend/vendor/
 /config/app.php
 
 /tmp/cache/models/*
@@ -22,4 +23,50 @@
 /app/tmp/*
 /app/Config/core.php
 /app/Config/database.php
-/vendors/*
+/vendors/
+
+# Node dependencies
+
+/node_modules/
+
+# Build outputs
+
+/dist/
+/build/
+/public/build/
+/public/dist/
+
+# Package manager logs
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment files
+
+.env
+.env.local
+.env.*.local
+
+# Cache folders
+
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+.svelte-kit/
+
+# Coverage reports
+
+/coverage/
+
+# OS / Editor junk
+
+.DS_Store
+Thumbs.db
+
+# Optional: minified generated assets
+
+*.min.js
+*.min.css

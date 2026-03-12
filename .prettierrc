@@ -1,0 +1,7 @@
+{
+    "tabWidth": 4,
+    "useTabs": false,
+    "singleQuote": true,
+    "phpVersion": "8.0",
+    "plugins": ["@prettier/plugin-php"]
+}
