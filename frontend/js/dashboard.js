@@ -82,4 +82,31 @@ function showSalaries() {
     loadSalaries();
 }
 
+async function logout() {
+    const confirmAction = confirm('Are you sure you want to logout?');
+
+    if (!confirmAction) return;
+
+    try {
+        const res = await fetch('../backend/api/auth/logout.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            alert(data.message);
+            window.location.href = 'login.html'; // Redirect to login page
+        } else {
+            alert('Failed to logout. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while logging out.');
+    }
+}
+
 loadEmployees();
