@@ -128,6 +128,7 @@ session_regenerate_id(true);
 $_SESSION['user_id'] = $user['user_id'];
 $_SESSION['employee_id'] = $user['employee_id'];
 $_SESSION['role_id'] = $user['role_id'];
+$_SESSION['username'] = $user['username'];
 
 $_SESSION['created'] = time();
 $_SESSION['last_activity'] = time();
