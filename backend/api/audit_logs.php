@@ -1,4 +1,8 @@
 <?php
+/**
+ * API endpoint to fetch audit logs for admin dashboard.
+ * Access is role-based (only admins can access).
+ */
 
 require_once './auth/auth.php';
 require_once '../config/database.php';

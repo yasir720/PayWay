@@ -1,4 +1,8 @@
 <?php
+/**
+ * API endpoint to apply department-based raises to all employees.
+ * Access is role-based (only HR and Admin can access).
+ */
 
 require_once './auth/auth.php';
 require_once '../config/database.php';

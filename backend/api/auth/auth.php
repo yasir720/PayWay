@@ -1,4 +1,7 @@
 <?php
+/**
+ * API endpoint to handle user authentication and session management.
+ */
 
 session_start();
 

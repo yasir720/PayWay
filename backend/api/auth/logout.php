@@ -1,4 +1,9 @@
 <?php
+/**
+ * API endpoint to log out the current user.
+ * It destroys the session and logs the logout action in the audit logs.
+ */
+
 session_start();
 
 require_once '../../config/database.php';
