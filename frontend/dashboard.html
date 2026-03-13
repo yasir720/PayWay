@@ -18,6 +18,9 @@
                     <button class="nav-btn" onclick="showSalaries()">
                         Salary Data
                     </button>
+                    <button class="nav-btn" onclick="showAuditLogs()">
+                        Audit Logs
+                    </button>
                     <button class="nav-btn" onclick="logout()">Logout</button>
                 </nav>
             </header>
@@ -45,7 +48,7 @@
                 </table>
             </section>
 
-            <section id="salary-section" class="section">
+            <section id="salary-section" class="section" style="display:none;">
                 <h3>Current Salaries</h3>
                 <table id="salary-table" class="data-table">
                     <thead>
@@ -59,6 +62,27 @@
                 </table>
                 <div id="salary-history-container"></div>
             </section>
+
+            <section id="audit-section" class="section" style="display:none;">
+                <h3>Audit Log</h3>
+                <table id="audit-table" class="data-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Action</th>
+                            <th>Entity</th>
+                            <th>ID</th>
+                            <th>Description</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </section>
+
+
+
+
         </div>
 
         <script src="./js/dashboard.js"></script>

@@ -72,14 +72,14 @@ if (!$username || !$password) {
 
 // username format check
 if (!preg_match('/^[a-zA-Z0-9_.]{3,20}$/', $username)) {
-log_audit(
-    $pdo,
-    null,
-    'LOGIN',
-    'users',
-    null,
-    "Wrong username format attempt: '$username'"
-);
+    log_audit(
+        $pdo,
+        null,
+        'LOGIN',
+        'users',
+        null,
+        "Wrong username format attempt: '$username'",
+    );
     http_response_code(400);
     echo json_encode([
         'message' =>
@@ -89,19 +89,21 @@ log_audit(
 }
 
 // password strength check (at least 8 chars, upper, lower, number, special)
-if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/', $password)) {
+if (
+    !preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/', $password)
+) {
     log_audit(
-    $pdo,
-    null,
-    'LOGIN',
-    'users',
-    null,
-    "Weak password attempt for username: '$username'"
-);
+        $pdo,
+        null,
+        'LOGIN',
+        'users',
+        null,
+        "Weak password attempt for username: '$username'",
+    );
     http_response_code(400);
     echo json_encode([
-        'message' => 
-            'Password is not safe. It must be at least 8 characters and include uppercase, lowercase, number, and special character.'
+        'message' =>
+            'Password is not safe. It must be at least 8 characters and include uppercase, lowercase, number, and special character.',
     ]);
     exit();
 }

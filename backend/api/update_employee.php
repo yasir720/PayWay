@@ -1,4 +1,8 @@
 <?php
+/**
+ * API endpoint to update employee information.
+ * Access is role-based.
+ */
 
 require_once './../auth/auth.php';
 require_once './../config/database.php';
