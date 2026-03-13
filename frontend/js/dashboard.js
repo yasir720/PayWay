@@ -45,6 +45,34 @@ async function loadSalaries() {
     });
 }
 
+async function loadAuditLogs() {
+    const res = await fetch('../backend/api/audit_logs.php');
+    const data = await res.json();
+
+    if (data.error) {
+        console.warn(data.error);
+        return;
+    }
+
+    const tbody = document.querySelector('#audit-table tbody');
+    tbody.innerHTML = '';
+
+    data.forEach((log) => {
+        const row = document.createElement('tr');
+
+        row.innerHTML = `
+            <td>${log.username ?? 'System'}</td>
+            <td>${log.action_type}</td>
+            <td>${log.entity_modified ?? ''}</td>
+            <td>${log.entity_id ?? ''}</td>
+            <td>${log.description ?? ''}</td>
+            <td>${log.timestamp}</td>
+        `;
+
+        tbody.appendChild(row);
+    });
+}
+
 async function applyRaises() {
     const confirmAction = confirm(
         'Are you sure you want to apply department raises?',
@@ -74,12 +102,22 @@ function editEmployee(id) {
 function showEmployees() {
     document.getElementById('employee-section').style.display = 'block';
     document.getElementById('salary-section').style.display = 'none';
+    document.getElementById('audit-section').style.display = 'none';
 }
 
 function showSalaries() {
     document.getElementById('employee-section').style.display = 'none';
     document.getElementById('salary-section').style.display = 'block';
+    document.getElementById('audit-section').style.display = 'none';
     loadSalaries();
+}
+
+function showAuditLogs() {
+    document.getElementById('employee-section').style.display = 'none';
+    document.getElementById('salary-section').style.display = 'none';
+    document.getElementById('audit-section').style.display = 'block';
+
+    loadAuditLogs();
 }
 
 async function logout() {
