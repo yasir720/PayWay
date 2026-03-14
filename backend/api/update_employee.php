@@ -27,7 +27,6 @@ if ($role == 1) {
 }
 
 try {
-
     $pdo->beginTransaction();
 
     // get existing employee record
@@ -48,12 +47,10 @@ try {
 
     // HR restriction (3 months)
     if ($role == 2) {
-
         $hire_date = strtotime($employee['hire_date']);
         $three_months = strtotime('-3 months');
 
         if ($hire_date < $three_months) {
-
             http_response_code(403);
 
             echo json_encode([
@@ -79,7 +76,7 @@ try {
         'last' => $last_name,
         'email' => $email,
         'dept' => $department_id,
-        'id' => $employee_id
+        'id' => $employee_id,
     ]);
 
     // build change description
@@ -102,8 +99,7 @@ try {
     }
 
     if (!empty($changes)) {
-
-        $description = implode(", ", $changes);
+        $description = implode(', ', $changes);
 
         $log = $pdo->prepare("
             INSERT INTO audit_logs
@@ -114,21 +110,19 @@ try {
         $log->execute([
             'user_id' => $user_id,
             'entity_id' => $employee_id,
-            'description' => $description
+            'description' => $description,
         ]);
     }
 
     $pdo->commit();
 
     echo json_encode(['message' => 'Employee updated successfully']);
-
 } catch (Exception $e) {
-
     $pdo->rollBack();
 
     http_response_code(500);
 
     echo json_encode([
-        'message' => 'Update failed'
+        'message' => 'Update failed',
     ]);
 }

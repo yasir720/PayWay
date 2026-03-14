@@ -13,9 +13,9 @@ $role = $_SESSION['role_id'];
 
 if ($role != 3) {
     echo json_encode([
-        "error" => "Only admins can access this page"
+        'error' => 'Only admins can access this page',
     ]);
-    exit;
+    exit();
 }
 
 $stmt = $pdo->prepare("

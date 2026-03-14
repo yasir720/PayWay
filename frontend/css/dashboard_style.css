@@ -134,11 +134,11 @@ button:hover {
     margin-top: 10px;
 }
 
-.modal-actions button[onclick="closeModal()"] {
+.modal-actions button[onclick='closeModal()'] {
     background-color: #e0e0e0;
     color: #333;
 }
 
-.modal-actions button[onclick="closeModal()"]:hover {
+.modal-actions button[onclick='closeModal()']:hover {
     background-color: #d0d0d0;
 }
