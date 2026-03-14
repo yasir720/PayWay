@@ -21,6 +21,9 @@
                     <button class="nav-btn" onclick="showAuditLogs()">
                         Audit Logs
                     </button>
+                    <button class="nav-btn" onclick="showRegisterUser()">
+                        Register User
+                    </button>
                     <button class="nav-btn" onclick="logout()">Logout</button>
                 </nav>
             </header>
@@ -101,7 +104,40 @@
 
                 <div class="modal-actions">
                     <button type="button" onclick="submitEdit()">Save</button>
-                    <button type="button" onclick="closeModal()">Cancel</button>
+                    <button type="button" onclick="closeEditEmployeeModal()">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="register-modal" class="modal" style="display: none">
+            <div class="modal-content">
+                <h3>Register User</h3>
+
+                <label>Username</label>
+                <input id="register-username" />
+
+                <label>Password</label>
+                <input type="password" id="register-password" />
+
+                <label>Employee ID</label>
+                <input id="register-employee-id" />
+
+                <label>Role</label>
+                <select id="register-role">
+                    <option value="1">Employee</option>
+                    <option value="2">HR</option>
+                    <option value="3">Admin</option>
+                </select>
+
+                <div class="modal-actions">
+                    <button type="button" onclick="submitRegister()">
+                        Register
+                    </button>
+                    <button type="button" onclick="closeRegisterModal()">
+                        Cancel
+                    </button>
                 </div>
             </div>
         </div>
