@@ -79,10 +79,31 @@
                     <tbody></tbody>
                 </table>
             </section>
+        </div>
 
+        <div id="edit-modal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <h3>Edit Employee</h3>
 
+                <input type="hidden" id="edit-id">
 
+                <label>First Name</label>
+                <input id="edit-first">
 
+                <label>Last Name</label>
+                <input id="edit-last">
+
+                <label>Email</label>
+                <input id="edit-email">
+
+                <label>Department ID</label>
+                <input id="edit-department">
+
+                <div class="modal-actions">
+                    <button type="button" onclick="submitEdit()">Save</button>
+                    <button type="button" onclick="closeModal()">Cancel</button>
+                </div>
+            </div>
         </div>
 
         <script src="./js/dashboard.js"></script>

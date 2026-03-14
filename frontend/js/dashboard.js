@@ -6,6 +6,7 @@
 
 const API = {
     employees: '../backend/api/dashboard.php',
+    updateEmployee: '../backend/api/update_employee.php',
     salaries: '../backend/api/salaries.php',
     auditLogs: '../backend/api/audit_logs.php',
     applyRaises: '../backend/api/apply_raises.php',
@@ -40,7 +41,14 @@ async function loadEmployees() {
             <td>${emp.email}</td>
             <td>${emp.department_name}</td>
             <td>
-                <button onclick="editEmployee(${emp.employee_id})">Edit</button>
+                <button onclick="editEmployee(
+                    ${emp.employee_id}, 
+                    '${emp.first_name}', 
+                    '${emp.last_name}', 
+                    '${emp.email}', 
+                    '${emp.department_id}')">
+                    Edit
+                </button>
             </td>
         `;
 
@@ -151,12 +159,52 @@ async function applyRaises() {
     loadSalaries();
 }
 
-//Placeholder for editing an employee
-function editEmployee(id) {
-    if (!confirm('Are you sure you want to make this change?')) return;
+// Editing an employee - pre-fills the edit form and shows the modal
+function editEmployee(id, first, last, email, dept) {
 
-    // TODO: wire up update API (DEV-18)
-    console.warn('editEmployee is not yet implemented', id);
+    document.getElementById("edit-id").value = id;
+    document.getElementById("edit-first").value = first;
+    document.getElementById("edit-last").value = last;
+    document.getElementById("edit-email").value = email;
+    document.getElementById("edit-department").value = dept;
+
+    document.getElementById("edit-modal").style.display = "block";
+}
+
+async function submitEdit() {
+
+    if (!confirm("Are you sure you want to save these changes?")) return;
+
+    const payload = {
+
+        employee_id: document.getElementById("edit-id").value,
+        first_name: document.getElementById("edit-first").value,
+        last_name: document.getElementById("edit-last").value,
+        email: document.getElementById("edit-email").value,
+        department_id: document.getElementById("edit-department").value
+    };
+
+    try {
+
+        const { message } = await fetchJson(API.updateEmployee, {
+
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+
+        });
+
+        alert(message);
+
+        closeModal();
+
+        loadEmployees();
+
+    } catch (error) {
+
+        alert(error.message);
+
+    }
 }
 
 // Show the requested section and hide others
@@ -179,6 +227,10 @@ function showSalaries() {
 function showAuditLogs() {
     showSection('audit-section');
     loadAuditLogs();
+}
+
+function closeModal() {
+    document.getElementById("edit-modal").style.display = "none";
 }
 
 // Log the current user out
