@@ -19,6 +19,7 @@ if ($role == 1) {
                e.last_name,
                e.email,
                d.department_name
+               d.department_id
         FROM employees e
         LEFT JOIN departments d 
                ON e.department_id = d.department_id
@@ -33,7 +34,8 @@ if ($role == 1) {
                e.first_name,
                e.last_name,
                e.email,
-               d.department_name
+               d.department_name,
+               d.department_id
         FROM employees e
         LEFT JOIN departments d 
                ON e.department_id = d.department_id
