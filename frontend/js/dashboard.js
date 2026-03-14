@@ -10,8 +10,12 @@ const API = {
     salaries: '../backend/api/salaries.php',
     auditLogs: '../backend/api/audit_logs.php',
     applyRaises: '../backend/api/apply_raises.php',
+    registerUser: '../backend/api/register_user.php',
     logout: '../backend/api/auth/logout.php',
+    getCurrentUser: '../backend/api/auth/get_current_user.php',
 };
+
+let currentRole = null;
 
 // Helper to fetch JSON and handle basic error paths
 async function fetchJson(url, options = {}) {
@@ -23,6 +27,17 @@ async function fetchJson(url, options = {}) {
     }
 
     return payload;
+}
+
+// Load the current user's role to determine access permissions
+async function loadCurrentUser() {
+    try {
+        const res = await fetchJson(API.getCurrentUser);
+        currentRole = res.role_id;
+    } catch (err) {
+        console.error('Failed to fetch current user role', err);
+        alert('Failed to determine user role. Some features may be disabled.');
+    }
 }
 
 // Render a list of employees into the employee table
@@ -167,6 +182,30 @@ function editEmployee(id, first, last, email, dept) {
     document.getElementById('edit-modal').style.display = 'block';
 }
 
+async function submitRegister() {
+    if (!confirm('Are you sure you want to save these changes?')) return;
+
+    const payload = {
+        username: document.getElementById('register-username').value,
+        password: document.getElementById('register-password').value,
+        employee_id: document.getElementById('register-employee-id').value,
+        role_id: parseInt(document.getElementById('register-role').value),
+    };
+
+    try {
+        const res = await fetchJson(API.registerUser, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+
+        alert(res.message);
+        closeRegisterModal();
+    } catch (err) {
+        alert(err.message);
+    }
+}
+
 async function submitEdit() {
     if (!confirm('Are you sure you want to save these changes?')) return;
 
@@ -187,7 +226,7 @@ async function submitEdit() {
 
         alert(message);
 
-        closeModal();
+        closeEditEmployeeModal();
 
         loadEmployees();
     } catch (error) {
@@ -217,8 +256,20 @@ function showAuditLogs() {
     loadAuditLogs();
 }
 
-function closeModal() {
+function showRegisterUser() {
+    if (currentRole !== 3) {
+        alert('Unauthorized: Only Admins can register new users.');
+        return;
+    }
+    document.getElementById('register-modal').style.display = 'block';
+}
+
+function closeEditEmployeeModal() {
     document.getElementById('edit-modal').style.display = 'none';
+}
+
+function closeRegisterModal() {
+    document.getElementById('register-modal').style.display = 'none';
 }
 
 // Log the current user out
@@ -240,4 +291,12 @@ async function logout() {
 }
 
 // Initial load
-loadEmployees();
+(async function init() {
+    try {
+        await loadCurrentUser(); // load role first
+        await loadEmployees(); // then load employees
+    } catch (err) {
+        console.error('Initialization failed:', err);
+        alert('Failed to load dashboard. Some features may not work.');
+    }
+})();

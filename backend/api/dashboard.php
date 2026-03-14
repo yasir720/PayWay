@@ -25,6 +25,7 @@ if ($role == 1) {
                ON e.department_id = d.department_id
         WHERE e.employee_id = :employee_id
           AND e.status = 'active'
+          ORDER BY d.department_id, e.last_name, e.first_name
     ");
 
     $stmt->execute(['employee_id' => $employee_id]);
@@ -40,6 +41,7 @@ if ($role == 1) {
         LEFT JOIN departments d 
                ON e.department_id = d.department_id
         WHERE e.status = 'active'
+        ORDER BY d.department_id, e.last_name, e.first_name
     ");
 
     $stmt->execute();
