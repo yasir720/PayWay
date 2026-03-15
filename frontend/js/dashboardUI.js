@@ -8,8 +8,9 @@ export class DashboardUI {
     }
 
     show(sectionId) {
-        Object.keys(this.sections).forEach(id => {
-            this.sections[id].style.display = id === sectionId ? 'block' : 'none';
+        Object.keys(this.sections).forEach((id) => {
+            this.sections[id].style.display =
+                id === sectionId ? 'block' : 'none';
         });
     }
 }

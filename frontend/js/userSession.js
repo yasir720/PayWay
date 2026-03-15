@@ -12,7 +12,9 @@ export class UserSession {
             this.role = res.role_id;
         } catch (err) {
             console.error('Failed to fetch current user', err);
-            alert('Failed to determine user role. Some features may be disabled.');
+            alert(
+                'Failed to determine user role. Some features may be disabled.',
+            );
         }
     }
 

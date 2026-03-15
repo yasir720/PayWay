@@ -17,7 +17,7 @@ const modalManager = new ModalManager();
 const ui = new DashboardUI({
     employees: document.getElementById('employee-section'),
     salary: document.getElementById('salary-section'),
-    audit: document.getElementById('audit-section')
+    audit: document.getElementById('audit-section'),
 });
 
 // Register modals
@@ -32,25 +32,31 @@ const auditTable = new TableRenderer('#audit-table');
 // --- Data Loaders ---
 async function loadEmployees() {
     const employees = await api.fetchJson('employees');
-    employeeTable.renderRows(employees, emp => `
+    employeeTable.renderRows(
+        employees,
+        (emp) => `
         <td>${emp.first_name} ${emp.last_name}</td>
         <td>${emp.email}</td>
         <td>${emp.department_name}</td>
         <td>
             <button onclick="editEmployee(${emp.employee_id}, '${emp.first_name}', '${emp.last_name}', '${emp.email}', '${emp.department_id}')">Edit</button>
         </td>
-    `);
+    `,
+    );
 }
 
 async function loadSalaries() {
     const data = await api.fetchJson('salaries');
 
     // Current
-    salaryTable.renderRows(data.current, s => `
+    salaryTable.renderRows(
+        data.current,
+        (s) => `
         <td>${s.first_name} ${s.last_name}</td>
         <td>$${s.salary_amount}</td>
         <td>${s.effective_date}</td>
-    `);
+    `,
+    );
 
     // History
     const existingHistory = document.querySelector('#salary-history-table');
@@ -79,7 +85,7 @@ async function loadSalaries() {
         section.appendChild(historyTable);
         const tbody = historyTable.querySelector('tbody');
 
-        data.history.forEach(h => {
+        data.history.forEach((h) => {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${h.first_name} ${h.last_name}</td>
@@ -96,26 +102,30 @@ async function loadSalaries() {
 
 async function loadAuditLogs() {
     const audits = await api.fetchJson('auditLogs');
-    auditTable.renderRows(audits, log => `
+    auditTable.renderRows(
+        audits,
+        (log) => `
         <td>${log.username ?? 'System'}</td>
         <td>${log.action_type}</td>
         <td>${log.entity_modified ?? ''}</td>
         <td>${log.entity_id ?? ''}</td>
         <td>${log.description ?? ''}</td>
         <td>${log.timestamp}</td>
-    `);
+    `,
+    );
 }
 
 // --- Actions ---
 async function applyRaises() {
-    if (!Notifier.confirm('Are you sure you want to apply department raises?')) return;
+    if (!Notifier.confirm('Are you sure you want to apply department raises?'))
+        return;
     const { message } = await api.fetchJson('applyRaises', { method: 'POST' });
     Notifier.alert(message);
     loadSalaries();
 }
 
 // Employee edit modal
-window.editEmployee = function(id, first, last, email, dept) {
+window.editEmployee = function (id, first, last, email, dept) {
     document.getElementById('edit-id').value = id;
     document.getElementById('edit-first').value = first;
     document.getElementById('edit-last').value = last;
@@ -125,7 +135,8 @@ window.editEmployee = function(id, first, last, email, dept) {
 };
 
 async function submitEdit() {
-    if (!Notifier.confirm('Are you sure you want to save these changes?')) return;
+    if (!Notifier.confirm('Are you sure you want to save these changes?'))
+        return;
 
     const payload = {
         employee_id: document.getElementById('edit-id').value,
@@ -151,7 +162,8 @@ async function submitEdit() {
 }
 
 async function submitRegister() {
-    if (!Notifier.confirm('Are you sure you want to save these changes?')) return;
+    if (!Notifier.confirm('Are you sure you want to save these changes?'))
+        return;
 
     const payload = {
         username: document.getElementById('register-username').value,
@@ -189,7 +201,10 @@ async function logout() {
     if (!Notifier.confirm('Are you sure you want to logout?')) return;
 
     try {
-        const data = await api.fetchJson('logout', { method: 'POST', headers: { 'Content-Type': 'application/json' }});
+        const data = await api.fetchJson('logout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+        });
         Notifier.alert(data.message);
         window.location.href = 'login.html';
     } catch (error) {
@@ -211,8 +226,14 @@ async function logout() {
 
 // --- Expose actions globally for buttons ---
 window.showEmployees = () => showSection('employees');
-window.showSalaries = () => { showSection('salary'); loadSalaries(); };
-window.showAuditLogs = () => { showSection('audit'); loadAuditLogs(); };
+window.showSalaries = () => {
+    showSection('salary');
+    loadSalaries();
+};
+window.showAuditLogs = () => {
+    showSection('audit');
+    loadAuditLogs();
+};
 window.applyRaises = applyRaises;
 window.submitEdit = submitEdit;
 window.submitRegister = submitRegister;

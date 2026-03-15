@@ -13,7 +13,7 @@ export class TableRenderer {
 
     renderRows(data, rowMapper) {
         this.clear();
-        data.forEach(item => {
+        data.forEach((item) => {
             const row = document.createElement('tr');
             row.innerHTML = rowMapper(item);
             this.tableBody.appendChild(row);
