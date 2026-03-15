@@ -2,6 +2,7 @@
  * Handles user login by sending credentials to the backend API.
  * Displays success or error messages based on the response.
  */
+
 async function login() {
     // Get form input values
     const username = document.getElementById('username').value;

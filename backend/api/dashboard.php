@@ -1,4 +1,8 @@
 <?php
+/**
+ * API endpoint to fetch employee data for dashboard.
+ * Access is role-based.
+ */
 
 require_once './auth/auth.php';
 require_once '../config/database.php';
@@ -15,11 +19,13 @@ if ($role == 1) {
                e.last_name,
                e.email,
                d.department_name
+               d.department_id
         FROM employees e
         LEFT JOIN departments d 
                ON e.department_id = d.department_id
         WHERE e.employee_id = :employee_id
           AND e.status = 'active'
+          ORDER BY d.department_id, e.last_name, e.first_name
     ");
 
     $stmt->execute(['employee_id' => $employee_id]);
@@ -29,11 +35,13 @@ if ($role == 1) {
                e.first_name,
                e.last_name,
                e.email,
-               d.department_name
+               d.department_name,
+               d.department_id
         FROM employees e
         LEFT JOIN departments d 
                ON e.department_id = d.department_id
         WHERE e.status = 'active'
+        ORDER BY d.department_id, e.last_name, e.first_name
     ");
 
     $stmt->execute();

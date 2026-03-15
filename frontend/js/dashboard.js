@@ -1,7 +1,48 @@
-async function loadEmployees() {
-    const res = await fetch('../backend/api/dashboard.php');
-    const employees = await res.json();
+/*
+ * Dashboard page script
+ * - Loads and renders tables for employees, salaries, and audit logs.
+ * - Provides basic navigation between sections.
+ */
 
+const API = {
+    employees: '../backend/api/dashboard.php',
+    updateEmployee: '../backend/api/update_employee.php',
+    salaries: '../backend/api/salaries.php',
+    auditLogs: '../backend/api/audit_logs.php',
+    applyRaises: '../backend/api/apply_raises.php',
+    registerUser: '../backend/api/register_user.php',
+    logout: '../backend/api/auth/logout.php',
+    getCurrentUser: '../backend/api/auth/get_current_user.php',
+};
+
+let currentRole = null;
+
+// Helper to fetch JSON and handle basic error paths
+async function fetchJson(url, options = {}) {
+    const res = await fetch(url, options);
+    const payload = await res.json().catch(() => null);
+
+    if (!res.ok) {
+        throw new Error(payload?.message || 'Request failed');
+    }
+
+    return payload;
+}
+
+// Load the current user's role to determine access permissions
+async function loadCurrentUser() {
+    try {
+        const res = await fetchJson(API.getCurrentUser);
+        currentRole = res.role_id;
+    } catch (err) {
+        console.error('Failed to fetch current user role', err);
+        alert('Failed to determine user role. Some features may be disabled.');
+    }
+}
+
+// Render a list of employees into the employee table
+async function loadEmployees() {
+    const employees = await fetchJson(API.employees);
     const tbody = document.querySelector('#employee-table tbody');
 
     tbody.innerHTML = '';
@@ -14,7 +55,12 @@ async function loadEmployees() {
             <td>${emp.email}</td>
             <td>${emp.department_name}</td>
             <td>
-                <button onclick="editEmployee(${emp.employee_id})">
+                <button onclick="editEmployee(
+                    ${emp.employee_id}, 
+                    '${emp.first_name}', 
+                    '${emp.last_name}', 
+                    '${emp.email}', 
+                    '${emp.department_id}')">
                     Edit
                 </button>
             </td>
@@ -24,99 +70,13 @@ async function loadEmployees() {
     });
 }
 
+// Render current salaries and optional history into salary section
 async function loadSalaries() {
-    const res = await fetch('../backend/api/salaries.php');
-    const salaries = await res.json();
-
-    const tbody = document.querySelector('#salary-table tbody');
-
-    tbody.innerHTML = '';
-
-    salaries.forEach((s) => {
-        const row = document.createElement('tr');
-
-        row.innerHTML = `
-            <td>${s.first_name} ${s.last_name}</td>
-            <td>$${s.salary_amount}</td>
-            <td>${s.effective_date}</td>
-        `;
-
-        tbody.appendChild(row);
-    });
-}
-
-async function applyRaises() {
-    const confirmAction = confirm(
-        'Are you sure you want to apply department raises?',
-    );
-
-    if (!confirmAction) return;
-
-    const res = await fetch('../backend/api/apply_raises.php', {
-        method: 'POST',
-    });
-
-    const data = await res.json();
-
-    alert(data.message);
-
-    loadSalaries();
-}
-
-function editEmployee(id) {
-    const confirmChange = confirm('Are you sure you want to make this change?');
-
-    if (!confirmChange) return;
-
-    // TODO: Add in call to update API. Task DEV-18
-}
-
-function showEmployees() {
-    document.getElementById('employee-section').style.display = 'block';
-    document.getElementById('salary-section').style.display = 'none';
-}
-
-function showSalaries() {
-    document.getElementById('employee-section').style.display = 'none';
-    document.getElementById('salary-section').style.display = 'block';
-    loadSalaries();
-}
-
-async function logout() {
-    const confirmAction = confirm('Are you sure you want to logout?');
-
-    if (!confirmAction) return;
-
-    try {
-        const res = await fetch('../backend/api/auth/logout.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-
-        const data = await res.json();
-
-        if (res.ok) {
-            alert(data.message);
-            window.location.href = 'login.html'; // Redirect to login page
-        } else {
-            alert('Failed to logout. Please try again.');
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('An error occurred while logging out.');
-    }
-}
-
-async function loadSalaries() {
-    const res = await fetch('../backend/api/salaries.php');
-    const data = await res.json();
-
+    const data = await fetchJson(API.salaries);
     const tbodyCurrent = document.querySelector('#salary-table tbody');
+
     tbodyCurrent.innerHTML = '';
 
-    // Current salaries
     data.current.forEach((s) => {
         const row = document.createElement('tr');
 
@@ -129,53 +89,214 @@ async function loadSalaries() {
         tbodyCurrent.appendChild(row);
     });
 
-    // Remove old history table if it exists
-    let oldHistoryTable = document.querySelector('#salary-history-table');
-    if (oldHistoryTable) oldHistoryTable.remove();
+    // Recreate history table when needed (prevents duplicates)
+    const existingHistory = document.querySelector('#salary-history-table');
+    if (existingHistory) existingHistory.remove();
 
-    // Only show history if there is data
-    if (data.history.length > 0) {
-        const section = document.getElementById('salary-section');
+    if (!data.history || data.history.length === 0) return;
 
-        const historyTitle = document.createElement('h3');
-        historyTitle.textContent = 'Salary History';
-        section.appendChild(historyTitle);
+    const section = document.getElementById('salary-section');
 
-        const historyTable = document.createElement('table');
-        historyTable.id = 'salary-history-table';
-        historyTable.classList.add('data-table');
+    const historyTitle = document.createElement('h3');
+    historyTitle.textContent = 'Salary History';
+    section.appendChild(historyTitle);
 
-        historyTable.innerHTML = `
-            <thead>
-                <tr>
-                    <th>Employee</th>
-                    <th>Old Salary</th>
-                    <th>New Salary</th>
-                    <th>Change %</th>
-                    <th>Change Date</th>
-                    <th>Reason</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
+    const historyTable = document.createElement('table');
+    historyTable.id = 'salary-history-table';
+    historyTable.classList.add('data-table');
+
+    historyTable.innerHTML = `
+        <thead>
+            <tr>
+                <th>Employee</th>
+                <th>Old Salary</th>
+                <th>New Salary</th>
+                <th>Change %</th>
+                <th>Change Date</th>
+                <th>Reason</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    `;
+
+    section.appendChild(historyTable);
+
+    const tbodyHistory = historyTable.querySelector('tbody');
+
+    data.history.forEach((h) => {
+        const row = document.createElement('tr');
+
+        row.innerHTML = `
+            <td>${h.first_name} ${h.last_name}</td>
+            <td>$${h.old_salary}</td>
+            <td>$${h.new_salary}</td>
+            <td>${h.change_percent != null ? h.change_percent + '%' : ''}</td>
+            <td>${h.change_date}</td>
+            <td>${h.change_reason || ''}</td>
         `;
 
-        section.appendChild(historyTable);
+        tbodyHistory.appendChild(row);
+    });
+}
 
-        const tbodyHistory = historyTable.querySelector('tbody');
+// Render audit log table
+async function loadAuditLogs() {
+    const audits = await fetchJson(API.auditLogs);
+    const tbody = document.querySelector('#audit-table tbody');
 
-        data.history.forEach((h) => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${h.first_name} ${h.last_name}</td>
-                <td>$${h.old_salary}</td>
-                <td>$${h.new_salary}</td>
-                <td>${h.change_percent != null ? h.change_percent + '%' : ''}</td>
-                <td>${h.change_date}</td>
-                <td>${h.change_reason || ''}</td>
-            `;
-            tbodyHistory.appendChild(row);
+    tbody.innerHTML = '';
+
+    audits.forEach((log) => {
+        const row = document.createElement('tr');
+
+        row.innerHTML = `
+            <td>${log.username ?? 'System'}</td>
+            <td>${log.action_type}</td>
+            <td>${log.entity_modified ?? ''}</td>
+            <td>${log.entity_id ?? ''}</td>
+            <td>${log.description ?? ''}</td>
+            <td>${log.timestamp}</td>
+        `;
+
+        tbody.appendChild(row);
+    });
+}
+
+// Apply raises and refresh salaries
+async function applyRaises() {
+    if (!confirm('Are you sure you want to apply department raises?')) return;
+
+    const { message } = await fetchJson(API.applyRaises, { method: 'POST' });
+    alert(message);
+    loadSalaries();
+}
+
+// Editing an employee - pre-fills the edit form and shows the modal
+function editEmployee(id, first, last, email, dept) {
+    document.getElementById('edit-id').value = id;
+    document.getElementById('edit-first').value = first;
+    document.getElementById('edit-last').value = last;
+    document.getElementById('edit-email').value = email;
+    document.getElementById('edit-department').value = dept;
+
+    document.getElementById('edit-modal').style.display = 'block';
+}
+
+async function submitRegister() {
+    if (!confirm('Are you sure you want to save these changes?')) return;
+
+    const payload = {
+        username: document.getElementById('register-username').value,
+        password: document.getElementById('register-password').value,
+        employee_id: document.getElementById('register-employee-id').value,
+        role_id: parseInt(document.getElementById('register-role').value),
+    };
+
+    try {
+        const res = await fetchJson(API.registerUser, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
         });
+
+        alert(res.message);
+        closeRegisterModal();
+    } catch (err) {
+        alert(err.message);
     }
 }
 
-loadEmployees();
+async function submitEdit() {
+    if (!confirm('Are you sure you want to save these changes?')) return;
+
+    const payload = {
+        employee_id: document.getElementById('edit-id').value,
+        first_name: document.getElementById('edit-first').value,
+        last_name: document.getElementById('edit-last').value,
+        email: document.getElementById('edit-email').value,
+        department_id: document.getElementById('edit-department').value,
+    };
+
+    try {
+        const { message } = await fetchJson(API.updateEmployee, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+
+        alert(message);
+
+        closeEditEmployeeModal();
+
+        loadEmployees();
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+// Show the requested section and hide others
+function showSection(sectionId) {
+    ['employee-section', 'salary-section', 'audit-section'].forEach((id) => {
+        document.getElementById(id).style.display =
+            id === sectionId ? 'block' : 'none';
+    });
+}
+
+function showEmployees() {
+    showSection('employee-section');
+}
+
+function showSalaries() {
+    showSection('salary-section');
+    loadSalaries();
+}
+
+function showAuditLogs() {
+    showSection('audit-section');
+    loadAuditLogs();
+}
+
+function showRegisterUser() {
+    if (currentRole !== 3) {
+        alert('Unauthorized: Only Admins can register new users.');
+        return;
+    }
+    document.getElementById('register-modal').style.display = 'block';
+}
+
+function closeEditEmployeeModal() {
+    document.getElementById('edit-modal').style.display = 'none';
+}
+
+function closeRegisterModal() {
+    document.getElementById('register-modal').style.display = 'none';
+}
+
+// Log the current user out
+async function logout() {
+    if (!confirm('Are you sure you want to logout?')) return;
+
+    try {
+        const data = await fetchJson(API.logout, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+        });
+
+        alert(data.message);
+        window.location.href = 'login.html';
+    } catch (error) {
+        console.error('Logout failed', error);
+        alert('Failed to logout. Please try again.');
+    }
+}
+
+// Initial load
+(async function init() {
+    try {
+        await loadCurrentUser(); // load role first
+        await loadEmployees(); // then load employees
+    } catch (err) {
+        console.error('Initialization failed:', err);
+        alert('Failed to load dashboard. Some features may not work.');
+    }
+})();
