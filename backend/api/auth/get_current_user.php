@@ -36,4 +36,5 @@ try {
     echo json_encode(['message' => 'Failed to fetch user']);
 }
 
+
 ?>
