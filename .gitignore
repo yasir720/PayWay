@@ -70,3 +70,6 @@ Thumbs.db
 
 *.min.js
 *.min.css
+
+# Test output
+/backend/.phpunit.result.cache
