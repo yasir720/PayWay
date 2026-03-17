@@ -13,7 +13,7 @@ A lightweight employee management system built with PHP (backend) and plain HTML
 
 ## 🎬 Demo
 
-<video src="./videos/PayWay-Demo.mp4" width="600" height="400" controls></video>
+<video src="https://github.com/user-attachments/assets/498a487c-2020-4bc4-837b-27ea7ffc1cd9" width="600" height="400" controls></video>
 
 ## 🧰 Tech Stack
 
