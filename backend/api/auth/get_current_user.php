@@ -1,4 +1,12 @@
+/**
+ * API endpoint to fetch current logged-in user's information.
+ */
+
 <?php
+/**
+ * API endpoint to fetch current logged-in user's information.
+ */
+
 require_once './/auth.php'; // ensures session is active
 require_once '../../config/database.php';
 
@@ -31,4 +39,6 @@ try {
     http_response_code(500);
     echo json_encode(['message' => 'Failed to fetch user']);
 }
+
+
 ?>

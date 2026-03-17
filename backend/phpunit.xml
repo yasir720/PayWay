@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="vendor/autoload.php" colors="true" verbose="true">
+    <testsuites>
+        <testsuite name="PayWay Test Suite">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <php>
+        <!-- Prevent PHPUnit from polluting the output in tests that capture output -->
+        <ini name="display_errors" value="1" />
+        <ini name="error_reporting" value="-1" />
+    </php>
+</phpunit>
