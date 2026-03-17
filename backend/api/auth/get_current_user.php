@@ -1,3 +1,7 @@
+/**
+ * API endpoint to fetch current logged-in user's information.
+ */
+
 <?php
 /**
  * API endpoint to fetch current logged-in user's information.
@@ -35,4 +39,6 @@ try {
     http_response_code(500);
     echo json_encode(['message' => 'Failed to fetch user']);
 }
+
+
 ?>

@@ -41,32 +41,18 @@ async function loadCurrentUser() {
 
 // Render employee list into the table.
 async function loadEmployees() {
-    const employees = await fetchJson(API.employees);
-    const tbody = document.querySelector('#employee-table tbody');
-
-    tbody.innerHTML = '';
-
-    employees.forEach((emp) => {
-        const row = document.createElement('tr');
-
-        row.innerHTML = `
-            <td>${emp.first_name} ${emp.last_name}</td>
-            <td>${emp.email}</td>
-            <td>${emp.department_name}</td>
-            <td>
-                <button onclick="editEmployee(
-                    ${emp.employee_id}, 
-                    '${emp.first_name}', 
-                    '${emp.last_name}', 
-                    '${emp.email}', 
-                    '${emp.department_id}')">
-                    Edit
-                </button>
-            </td>
-        `;
-
-        tbody.appendChild(row);
-    });
+    const employees = await api.fetchJson('employees');
+    employeeTable.renderRows(
+        employees,
+        (emp) => `
+        <td>${emp.first_name} ${emp.last_name}</td>
+        <td>${emp.email}</td>
+        <td>${emp.department_name}</td>
+        <td>
+            <button onclick="editEmployee(${emp.employee_id}, '${emp.first_name}', '${emp.last_name}', '${emp.email}', '${emp.department_id}')">Edit</button>
+        </td>
+    `,
+    );
 }
 
 // Render current salaries and optional history.
@@ -92,50 +78,42 @@ async function loadSalaries() {
     const existingHistory = document.querySelector('#salary-history-table');
     if (existingHistory) existingHistory.remove();
 
-    if (!data.history || data.history.length === 0) return;
+    if (data.history && data.history.length) {
+        const section = document.getElementById('salary-section');
 
-    const section = document.getElementById('salary-section');
+        const historyTitle = document.createElement('h3');
+        historyTitle.textContent = 'Salary History';
+        section.appendChild(historyTitle);
 
-    const historyTitle = document.createElement('h3');
-    historyTitle.textContent = 'Salary History';
-    section.appendChild(historyTitle);
+        const historyTable = document.createElement('table');
+        historyTable.id = 'salary-history-table';
+        historyTable.classList.add('data-table');
 
-    const historyTable = document.createElement('table');
-    historyTable.id = 'salary-history-table';
-    historyTable.classList.add('data-table');
-
-    historyTable.innerHTML = `
-        <thead>
-            <tr>
-                <th>Employee</th>
-                <th>Old Salary</th>
-                <th>New Salary</th>
-                <th>Change %</th>
-                <th>Change Date</th>
-                <th>Reason</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    `;
-
-    section.appendChild(historyTable);
-
-    const tbodyHistory = historyTable.querySelector('tbody');
-
-    data.history.forEach((h) => {
-        const row = document.createElement('tr');
-
-        row.innerHTML = `
-            <td>${h.first_name} ${h.last_name}</td>
-            <td>$${h.old_salary}</td>
-            <td>$${h.new_salary}</td>
-            <td>${h.change_percent != null ? h.change_percent + '%' : ''}</td>
-            <td>${h.change_date}</td>
-            <td>${h.change_reason || ''}</td>
+        historyTable.innerHTML = `
+            <thead>
+                <tr>
+                    <th>Employee</th><th>Old Salary</th><th>New Salary</th><th>Change %</th><th>Change Date</th><th>Reason</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
         `;
 
-        tbodyHistory.appendChild(row);
-    });
+        section.appendChild(historyTable);
+        const tbody = historyTable.querySelector('tbody');
+
+        data.history.forEach((h) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${h.first_name} ${h.last_name}</td>
+                <td>$${h.old_salary}</td>
+                <td>$${h.new_salary}</td>
+                <td>${h.change_percent != null ? h.change_percent + '%' : ''}</td>
+                <td>${h.change_date}</td>
+                <td>${h.change_reason || ''}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
 }
 
 // Render audit log entries.
@@ -163,10 +141,10 @@ async function loadAuditLogs() {
 
 // Apply raises and refresh salary view.
 async function applyRaises() {
-    if (!confirm('Are you sure you want to apply department raises?')) return;
-
-    const { message } = await fetchJson(API.applyRaises, { method: 'POST' });
-    alert(message);
+    if (!Notifier.confirm('Are you sure you want to apply department raises?'))
+        return;
+    const { message } = await api.fetchJson('applyRaises', { method: 'POST' });
+    Notifier.alert(message);
     loadSalaries();
 }
 
@@ -177,36 +155,12 @@ function editEmployee(id, first, last, email, dept) {
     document.getElementById('edit-last').value = last;
     document.getElementById('edit-email').value = email;
     document.getElementById('edit-department').value = dept;
-
-    document.getElementById('edit-modal').style.display = 'block';
-}
-
-async function submitRegister() {
-    if (!confirm('Are you sure you want to save these changes?')) return;
-
-    const payload = {
-        username: document.getElementById('register-username').value,
-        password: document.getElementById('register-password').value,
-        employee_id: document.getElementById('register-employee-id').value,
-        role_id: parseInt(document.getElementById('register-role').value),
-    };
-
-    try {
-        const res = await fetchJson(API.registerUser, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-        });
-
-        alert(res.message);
-        closeRegisterModal();
-    } catch (err) {
-        alert(err.message);
-    }
-}
+    modalManager.open('edit-modal');
+};
 
 async function submitEdit() {
-    if (!confirm('Are you sure you want to save these changes?')) return;
+    if (!Notifier.confirm('Are you sure you want to save these changes?'))
+        return;
 
     const payload = {
         employee_id: document.getElementById('edit-id').value,
@@ -217,19 +171,17 @@ async function submitEdit() {
     };
 
     try {
-        const { message } = await fetchJson(API.updateEmployee, {
+        const { message } = await api.fetchJson('updateEmployee', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
         });
 
-        alert(message);
-
-        closeEditEmployeeModal();
-
+        Notifier.alert(message);
+        modalManager.close('edit-modal');
         loadEmployees();
     } catch (error) {
-        alert(error.message);
+        Notifier.alert(error.message);
     }
 }
 
@@ -241,61 +193,79 @@ function showSection(sectionId) {
     });
 }
 
-function showEmployees() {
-    showSection('employee-section');
+    const payload = {
+        username: document.getElementById('register-username').value,
+        password: document.getElementById('register-password').value,
+        employee_id: document.getElementById('register-employee-id').value,
+        role_id: parseInt(document.getElementById('register-role').value),
+    };
+
+    try {
+        const res = await api.fetchJson('registerUser', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+        Notifier.alert(res.message);
+        modalManager.close('register-modal');
+    } catch (err) {
+        Notifier.alert(err.message);
+    }
 }
 
-function showSalaries() {
-    showSection('salary-section');
-    loadSalaries();
-}
-
-function showAuditLogs() {
-    showSection('audit-section');
-    loadAuditLogs();
+function showSection(section) {
+    ui.show(section);
 }
 
 function showRegisterUser() {
-    if (currentRole !== 3) {
-        alert('Unauthorized: Only Admins can register new users.');
+    if (!userSession.isAdmin()) {
+        Notifier.alert('Unauthorized: Only Admins can register new users.');
         return;
     }
-    document.getElementById('register-modal').style.display = 'block';
+    modalManager.open('register-modal');
 }
 
-function closeEditEmployeeModal() {
-    document.getElementById('edit-modal').style.display = 'none';
-}
-
-function closeRegisterModal() {
-    document.getElementById('register-modal').style.display = 'none';
-}
-
-// Log the current user out
 async function logout() {
-    if (!confirm('Are you sure you want to logout?')) return;
+    if (!Notifier.confirm('Are you sure you want to logout?')) return;
 
     try {
-        const data = await fetchJson(API.logout, {
+        const data = await api.fetchJson('logout', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
         });
-
-        alert(data.message);
+        Notifier.alert(data.message);
         window.location.href = 'login.html';
     } catch (error) {
         console.error('Logout failed', error);
-        alert('Failed to logout. Please try again.');
+        Notifier.alert('Failed to logout. Please try again.');
     }
 }
 
 // Initialize dashboard on page load.
 (async function init() {
     try {
-        await loadCurrentUser(); // load role first
-        await loadEmployees(); // then load employees
+        await userSession.loadCurrentUser(api);
+        await loadEmployees();
     } catch (err) {
         console.error('Initialization failed:', err);
-        alert('Failed to load dashboard. Some features may not work.');
+        Notifier.alert('Failed to load dashboard. Some features may not work.');
     }
 })();
+
+// --- Expose actions globally for buttons ---
+window.showEmployees = () => showSection('employees');
+window.showSalaries = () => {
+    showSection('salary');
+    loadSalaries();
+};
+window.showAuditLogs = () => {
+    showSection('audit');
+    loadAuditLogs();
+};
+window.applyRaises = applyRaises;
+window.submitEdit = submitEdit;
+window.submitRegister = submitRegister;
+window.showRegisterUser = showRegisterUser;
+window.logout = logout;
+window.closeEditEmployeeModal = () => modalManager.close('edit-modal');
+window.closeRegisterModal = () => modalManager.close('register-modal');
