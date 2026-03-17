@@ -18,6 +18,7 @@ session_start();
 header('Content-Type: application/json');
 
 require_once '../../config/database.php';
+require_once '../../utils/validation.php';
 
 // ensure database connection variable is available
 if (!isset($pdo)) {
@@ -71,7 +72,7 @@ if (!$username || !$password) {
 }
 
 // username format check
-if (!preg_match('/^[a-zA-Z0-9_.]{3,20}$/', $username)) {
+if (!validate_username($username)) {
     log_audit(
         $pdo,
         null,
@@ -89,9 +90,7 @@ if (!preg_match('/^[a-zA-Z0-9_.]{3,20}$/', $username)) {
 }
 
 // password strength check (at least 8 chars, upper, lower, number, special)
-if (
-    !preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/', $password)
-) {
+if (!validate_password($password)) {
     log_audit(
         $pdo,
         null,

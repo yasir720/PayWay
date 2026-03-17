@@ -1,4 +1,8 @@
 <?php
+/**
+ * API endpoint to fetch current logged-in user's information.
+ */
+
 require_once './/auth.php'; // ensures session is active
 require_once '../../config/database.php';
 
