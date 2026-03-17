@@ -1,7 +1,7 @@
 <?php
 /**
- * API endpoint to fetch employee data for dashboard.
- * Access is role-based.
+ * API endpoint to fetch employee list for the dashboard.
+ * Employees see only their own record; HR/Admin see all active employees.
  */
 
 require_once './auth/auth.php';

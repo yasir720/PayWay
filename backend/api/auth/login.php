@@ -1,11 +1,11 @@
 <?php
 /**
- * Simple login endpoint. Expects JSON {username,password}.
+ * Login endpoint. Expects JSON {username,password}.
  * Verifies credentials and starts a session.
- * Login attempts are logged in the database for security monitoring.
+ * Logs login attempts for auditing.
  */
 
-// configure and start a secure session
+// Configure and start a secure session.
 session_set_cookie_params([
     'lifetime' => 7200,
     'path' => '/',
@@ -20,14 +20,14 @@ header('Content-Type: application/json');
 require_once '../../config/database.php';
 require_once '../../utils/validation.php';
 
-// ensure database connection variable is available
+// Ensure the database connection is available.
 if (!isset($pdo)) {
     http_response_code(500);
     echo json_encode(['message' => 'internal server error']);
     exit();
 }
 
-// Helper function to log to audit_logs table
+// Helper to insert audit log entries.
 function log_audit(
     PDO $pdo,
     $user_id,
@@ -51,10 +51,10 @@ function log_audit(
     ]);
 }
 
-// parse JSON payload
+// Parse JSON request body.
 $data = json_decode(file_get_contents('php://input'), true);
 
-// reject malformed JSON explicitly
+// Reject malformed JSON.
 if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
     http_response_code(400);
     echo json_encode(['message' => 'Malformed JSON']);
@@ -64,14 +64,14 @@ if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
 $username = $data['username'] ?? '';
 $password = $data['password'] ?? '';
 
-// ensure both fields present
+// Require both username and password.
 if (!$username || !$password) {
     http_response_code(400);
     echo json_encode(['message' => 'username and password required']);
     exit();
 }
 
-// username format check
+// Validate username format.
 if (!validate_username($username)) {
     log_audit(
         $pdo,
@@ -89,7 +89,7 @@ if (!validate_username($username)) {
     exit();
 }
 
-// password strength check (at least 8 chars, upper, lower, number, special)
+// Validate password strength.
 if (!validate_password($password)) {
     log_audit(
         $pdo,
@@ -107,7 +107,7 @@ if (!validate_password($password)) {
     exit();
 }
 
-// Query user by username
+// Lookup user by username.
 try {
     $stmt = $pdo->prepare("
     SELECT user_id, employee_id, username, password_hash, role_id
@@ -123,9 +123,9 @@ try {
     exit();
 }
 
-// verify credentials
+// Validate credentials.
 if (!$user || !password_verify($password, $user['password_hash'])) {
-    // Log failed login (user_id may be null if username not found)
+    // Log failed login (user_id may be null if username does not exist).
 
     $log_user_id = $user['user_id'] ?? null;
 
@@ -142,7 +142,7 @@ if (!$user || !password_verify($password, $user['password_hash'])) {
     exit();
 }
 
-// create fresh session state
+// Initialize session state.
 session_regenerate_id(true);
 
 $_SESSION['user_id'] = $user['user_id'];
@@ -153,7 +153,7 @@ $_SESSION['username'] = $user['username'];
 $_SESSION['created'] = time();
 $_SESSION['last_activity'] = time();
 
-// log successful login
+// Record successful login.
 log_audit(
     $pdo,
     $user['user_id'],
@@ -163,7 +163,7 @@ log_audit(
     "User '$username' logged in successfully",
 );
 
-// send back minimal success info
+// Return minimal success response.
 echo json_encode([
     'message' => 'Login successful',
     'user_id' => $user['user_id'],

@@ -8,17 +8,17 @@ session_start();
 $maxSessionTime = 2 * 60 * 60; // 2 hours
 $maxIdleTime = 20 * 60; // 20 minutes
 
-// User not logged in
+// Reject requests without an authenticated session.
 if (!isset($_SESSION['user_id'])) {
     http_response_code(401);
     echo json_encode([
         'message' => 'Unauthorized',
     ]);
-    header('Location: /login.php'); // Adjust path if needed
+    header('Location: /login.php'); // Adjust path if needed.
     exit();
 }
 
-// Check absolute session lifetime
+// Check absolute session lifetime.
 if (
     isset($_SESSION['created']) &&
     time() - $_SESSION['created'] > $maxSessionTime
@@ -31,7 +31,7 @@ if (
     exit();
 }
 
-// Check inactivity timeout
+// Check inactivity timeout.
 if (
     isset($_SESSION['last_activity']) &&
     time() - $_SESSION['last_activity'] > $maxIdleTime

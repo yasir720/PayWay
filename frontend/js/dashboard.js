@@ -1,7 +1,6 @@
 /*
- * Dashboard page script
- * - Loads and renders tables for employees, salaries, and audit logs.
- * - Provides basic navigation between sections.
+ * Dashboard script.
+ * Manages employee, salary, and audit views.
  */
 
 const API = {
@@ -17,7 +16,7 @@ const API = {
 
 let currentRole = null;
 
-// Helper to fetch JSON and handle basic error paths
+// Helper to fetch JSON and throw on HTTP errors.
 async function fetchJson(url, options = {}) {
     const res = await fetch(url, options);
     const payload = await res.json().catch(() => null);
@@ -29,7 +28,7 @@ async function fetchJson(url, options = {}) {
     return payload;
 }
 
-// Load the current user's role to determine access permissions
+// Load the current user's role for permission checks.
 async function loadCurrentUser() {
     try {
         const res = await fetchJson(API.getCurrentUser);
@@ -40,7 +39,7 @@ async function loadCurrentUser() {
     }
 }
 
-// Render a list of employees into the employee table
+// Render employee list into the table.
 async function loadEmployees() {
     const employees = await fetchJson(API.employees);
     const tbody = document.querySelector('#employee-table tbody');
@@ -70,7 +69,7 @@ async function loadEmployees() {
     });
 }
 
-// Render current salaries and optional history into salary section
+// Render current salaries and optional history.
 async function loadSalaries() {
     const data = await fetchJson(API.salaries);
     const tbodyCurrent = document.querySelector('#salary-table tbody');
@@ -89,7 +88,7 @@ async function loadSalaries() {
         tbodyCurrent.appendChild(row);
     });
 
-    // Recreate history table when needed (prevents duplicates)
+    // Recreate history table to avoid duplicates.
     const existingHistory = document.querySelector('#salary-history-table');
     if (existingHistory) existingHistory.remove();
 
@@ -139,7 +138,7 @@ async function loadSalaries() {
     });
 }
 
-// Render audit log table
+// Render audit log entries.
 async function loadAuditLogs() {
     const audits = await fetchJson(API.auditLogs);
     const tbody = document.querySelector('#audit-table tbody');
@@ -162,7 +161,7 @@ async function loadAuditLogs() {
     });
 }
 
-// Apply raises and refresh salaries
+// Apply raises and refresh salary view.
 async function applyRaises() {
     if (!confirm('Are you sure you want to apply department raises?')) return;
 
@@ -171,7 +170,7 @@ async function applyRaises() {
     loadSalaries();
 }
 
-// Editing an employee - pre-fills the edit form and shows the modal
+// Prefill edit modal with employee data.
 function editEmployee(id, first, last, email, dept) {
     document.getElementById('edit-id').value = id;
     document.getElementById('edit-first').value = first;
@@ -234,7 +233,7 @@ async function submitEdit() {
     }
 }
 
-// Show the requested section and hide others
+// Switch dashboard sections.
 function showSection(sectionId) {
     ['employee-section', 'salary-section', 'audit-section'].forEach((id) => {
         document.getElementById(id).style.display =
@@ -290,7 +289,7 @@ async function logout() {
     }
 }
 
-// Initial load
+// Initialize dashboard on page load.
 (async function init() {
     try {
         await loadCurrentUser(); // load role first

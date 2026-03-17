@@ -4,12 +4,12 @@
  */
 
 async function login() {
-    // Get form input values
+    // Read form values.
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
     const messageDiv = document.getElementById('login-message');
 
-    // Send login request to backend
+    // Send login request.
     try {
         const response = await fetch('../../backend/api/auth/login.php', {
             method: 'POST',
@@ -17,13 +17,12 @@ async function login() {
             body: JSON.stringify({ username, password }),
         });
 
-        // Parse JSON response
+        // Parse JSON response.
         const data = await response.json();
 
-        // Handle successful login
         if (response.ok) {
             messageDiv.innerText = 'Login successful';
-            // redirect to dashboard
+            // Redirect to dashboard.
             window.location.href = 'dashboard.html';
         } else {
             messageDiv.innerText = data.message || 'Login failed';

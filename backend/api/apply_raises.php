@@ -1,7 +1,7 @@
 <?php
 /**
- * API endpoint to apply department-based raises to all employees.
- * Access is role-based (only HR and Admin can access).
+ * API endpoint that applies department-based raises to all employees.
+ * Only HR and Admin roles are allowed.
  */
 
 require_once './auth/auth.php';
@@ -21,9 +21,7 @@ if ($role == 1) {
 try {
     $pdo->beginTransaction();
 
-    /*
-    Get latest salaries and determine raise amounts
-    */
+    // Compute new salary values based on department ranking.
 
     $query = "
 
@@ -96,9 +94,7 @@ try {
 
     $pdo->exec($query);
 
-    /*
-    Insert salary history records
-    */
+    // Insert salary history records.
 
     $historyQuery = "
 

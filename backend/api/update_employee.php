@@ -29,7 +29,7 @@ if ($role == 1) {
 try {
     $pdo->beginTransaction();
 
-    // get existing employee record
+    // Fetch existing employee record.
     $stmt = $pdo->prepare("
         SELECT first_name, last_name, email, department_id, hire_date
         FROM employees
@@ -45,7 +45,7 @@ try {
         exit();
     }
 
-    // HR restriction (3 months)
+    // HR can only edit records from the last 3 months.
     if ($role == 2) {
         $hire_date = strtotime($employee['hire_date']);
         $three_months = strtotime('-3 months');
@@ -61,7 +61,7 @@ try {
         }
     }
 
-    // update employee
+    // Update employee record.
     $update = $pdo->prepare("
         UPDATE employees
         SET first_name = :first,
@@ -79,7 +79,7 @@ try {
         'id' => $employee_id,
     ]);
 
-    // build change description
+    // Record changes for audit logging.
     $changes = [];
 
     if ($employee['first_name'] != $first_name) {

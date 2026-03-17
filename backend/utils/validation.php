@@ -1,7 +1,7 @@
 <?php
 /**
- * Validation functions for user input.
- * These are used in registration and login flows to ensure data integrity.
+ * Helper functions for validating user input.
+ * Used by the authentication and registration endpoints.
  */
 
 // Validate username: 3-20 chars, letters/numbers/underscore/period only

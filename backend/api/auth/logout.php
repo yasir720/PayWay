@@ -8,7 +8,7 @@ session_start();
 
 require_once '../../config/database.php';
 
-// helper function to log audit entries
+// Helper to insert an audit log entry.
 function log_audit(
     PDO $pdo,
     $user_id,
@@ -30,11 +30,11 @@ function log_audit(
     ]);
 }
 
-// capture user ID from session if available
+// Capture user ID from session if available.
 $user_id = $_SESSION['user_id'] ?? null;
 $username = $_SESSION['username'] ?? null;
 
-// log the logout action if we know the user
+// Log the logout action if user is known.
 if ($user_id) {
     log_audit(
         $pdo,
@@ -46,11 +46,11 @@ if ($user_id) {
     );
 }
 
-// destroy all session data
+// Destroy all session data.
 $_SESSION = [];
 session_destroy();
 
-// send JSON response
+// Send JSON response.
 header('Content-Type: application/json');
 echo json_encode([
     'message' => 'Logged out successfully',

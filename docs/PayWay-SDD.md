@@ -2,7 +2,7 @@
 
 ## System Design Document (SDD)
 
-Version: 1.0  
+Version: 1.1  
 Author: Yasir Alizai  
 Date: March 2026
 
@@ -20,104 +20,61 @@ The document outlines the technologies used, system architecture, data design, a
 
 # 1.2 Technology Stack
 
-PayWay will use the following technologies:
+PayWay currently uses the following technologies:
 
-Technology
-
-Purpose
-
-PostgreSQL
-
-Relational database for storing application data
-
-AWS RDS
-
-Managed hosting for the PostgreSQL database
-
-PHP
-
-Backend application logic
-
-HTML
-
-Structure of web pages
-
-CSS
-
-User interface styling
-
-Style Guides
-
-Ensuring consistent UI design
-
-JSON
-
-Data format used for API communication
-
-HTTP/HTTPS
-
-Communication protocol between client and server
-
-OAuth
-
-Secure authentication and authorization
-
-Object-Oriented Programming (OOP)
-
-Application design methodology
-
-Jira
-
-Project management and issue tracking
+- **PHP 8+** — backend API implementation (procedural PHP scripts)
+- **PostgreSQL** — relational database (schema in `backend/db/schema.sql`)
+- **HTML / CSS / JavaScript** — frontend UI (static files in `frontend/`)
+- **PDO** — database access layer
+- **PHP sessions** — authentication state is stored in server-side sessions
+- **bcrypt** — password hashing (via `password_hash` / `password_verify`)
 
 ---
 
 # 2. System Architecture
 
-PayWay will follow a **three-tier architecture** consisting of a presentation layer, application layer, and data layer.
+PayWay is implemented as a web application with a browser-based frontend talking to a PHP backend over HTTP, with persistence in PostgreSQL.
 
-Client (Browser)  
- |  
- | HTTPS  
- |  
-Web Server (PHP Application)  
- |  
- | SQL Queries  
- |  
-AWS RDS PostgreSQL Database
+```
+Browser (HTML/JS)
+  ↕
+HTTP/HTTPS (cookie-based session)
+  ↕
+PHP API endpoints (backend/api/*.php)
+  ↕
+PostgreSQL (backend/db/schema.sql)
+```
 
 ### Components
 
 **Client Layer**
 
-- HTML pages rendered in the browser
-- CSS styling for UI
-- Forms for user interaction
+- Static HTML pages and JavaScript
+- UI interactions and API calls
 
 **Application Layer**
 
-- PHP backend services
-- Business logic for salary calculations
-- Authentication and authorization
-- API endpoints returning JSON responses
+- Procedural PHP scripts implementing API endpoints
+- Session-based authentication and role enforcement
+- Business logic for salaries, raises, and user management
 
 **Data Layer**
 
-- PostgreSQL database hosted on AWS RDS
-- Stores employee records, salary history, and system logs
+- PostgreSQL database (configured via `backend/config/env.php`)
+- Stores employees, salaries, users, roles, and audit logs
 
 ---
 
 # 3. Application Architecture
 
-The backend will follow an **Object-Oriented architecture** separating application responsibilities into distinct components.
+The backend is organized as a set of modular, procedural PHP scripts. Each endpoint in `backend/api/` acts as a controller that handles a specific responsibility.
 
 ### Main Application Layers
 
-Controllers  
-Business Logic / Services  
-Data Access Layer  
-Database
+- API endpoints (controllers)
+- Business logic (embedded in endpoint scripts)
+- Database access via PDO
+- PostgreSQL database
 
 ---
 
@@ -182,76 +139,68 @@ AuditRepository
 
 # 4. Authentication and Authorization
 
-PayWay will use **OAuth-based authentication** to secure access to the system.
+PayWay uses **session-based authentication** implemented with PHP sessions.
 
 ### Authentication Flow
 
-User logs in  
- |  
-OAuth provider authenticates user  
- |  
-Access token returned  
- |  
-User accesses PayWay APIs
+1. Client sends credentials to `POST /backend/api/auth/login.php`.
+2. Backend validates the username/password (bcrypt) and creates a session.
+3. A secure, HttpOnly cookie is returned to the client.
+4. Subsequent API requests include the session cookie and are authenticated server-side.
 
 ### Security Controls
 
-- OAuth access tokens required for API access
-- Role-based access control
-- Passwords stored using hashing
-- HTTPS enforced for all requests
+- Passwords are stored as bcrypt hashes.
+- Sessions expire after **2 hours** and idle out after **20 minutes**.
+- Role-based access control is enforced on API endpoints.
 
 ---
 
 # 5. API Design
 
-The PayWay backend will expose REST-style API endpoints using HTTP/HTTPS.
+The backend exposes a set of JSON APIs under `backend/api/`.
 
-All API responses will be formatted in **JSON**.
-
----
-
-## Example Endpoints
-
-### Authentication
-
-POST /api/auth/login  
-POST /api/auth/logout  
-GET /api/auth/me
+All APIs (except login) require an active session cookie.
 
 ---
 
-### Employee Management
+## Authentication
 
-GET /api/employees  
-GET /api/employees/{id}
-
-POST /api/employees  
-PUT /api/employees/{id}  
-DELETE /api/employees/{id}
+- `POST /backend/api/auth/login.php` — payload: `{ username, password }`
+- `POST /backend/api/auth/logout.php`
+- `GET /backend/api/auth/get_current_user.php`
 
 ---
 
-### Salary Management
+## Dashboard / Employee Data
 
-GET /api/salaries  
-GET /api/salaries/{employeeId}
-
-POST /api/salaries/update  
-POST /api/salaries/apply-raises
+- `GET /backend/api/dashboard.php` — returns employees (current user for Employees)
+- `POST /backend/api/update_employee.php` — updates employee information (role restricted)
 
 ---
 
-### PTO Management
+## Salaries
 
-GET /api/pto/{employeeId}  
-POST /api/pto/update
+- `GET /backend/api/salaries.php` — returns current salary data and salary history (history scope depends on role)
+- `POST /backend/api/apply_raises.php` — applies department-based raises (HR/Admin only)
+
+---
+
+## User Management
+
+- `POST /backend/api/register_user.php` — creates a user account (Admin only)
+
+---
+
+## Auditing
+
+- `GET /backend/api/audit_logs.php` — returns recent audit logs (Admin only)
 
 ---
 
 # 6. Database Architecture
 
-The PayWay system will use a **PostgreSQL relational database hosted on AWS RDS** to store application data. The database will maintain employee records, salary information, system users, and audit logs.
+The PayWay system uses a **PostgreSQL relational database** to store application data. The database maintains employee records, salary information, system users, and audit logs.
 
 The schema is designed to maintain **data integrity**, **support historical salary tracking**, and **enforce relationships between system entities**.
 
@@ -540,42 +489,25 @@ Indexes will be created on columns commonly used in sorting, filtering, and join
 
 ---
 
-# 7. Object-Oriented Design
+# 7. Code Organization
 
-The PayWay backend will follow **Object-Oriented Programming principles** to ensure modularity and maintainability.
+The backend is organized into modular, procedural scripts with shared helpers.
 
-Key principles used:
+### Shared Components
 
-### Encapsulation
-
-Classes manage their own data and behavior.
-
-Example:
-
-Employee  
-Salary  
-Department  
-User
-
----
+- `backend/config/database.php`: PDO database connection and configuration.
+- `backend/utils/validation.php`: input validation helpers.
+- `backend/api/auth/auth.php`: session validation and timeout enforcement.
 
 ### Separation of Concerns
 
-Each layer of the application has a distinct responsibility:
+Each API script focuses on a single responsibility:
 
-- Controllers handle requests
-- Services implement business logic
-- Repositories handle data access
+- Authentication endpoints (`backend/api/auth/*.php`)
+- Employee and salary management (`backend/api/dashboard.php`, `backend/api/salaries.php`, etc.)
+- Audit logging (`backend/api/audit_logs.php`)
 
----
-
-### Reusability
-
-Reusable services will be created for common operations such as:
-
-- Authentication
-- Salary calculations
-- Audit logging
+This structure keeps business logic close to the API surface while keeping shared utilities in common files.
 
 ---
 
@@ -594,25 +526,13 @@ The PayWay user interface will be built using **HTML and CSS**.
 
 ### Main Pages
 
-The application will include the following interfaces:
+The frontend is a single-page dashboard (`frontend/dashboard.html`) that adapts to the logged-in user’s role.
 
-Employee Dashboard
+- **Employee view:** view personal salary information.
+- **HR view:** view all employees, edit employee details (with restrictions), view current salaries and salary history, and apply raises.
+- **Admin view:** all HR functionality plus user registration and viewing audit logs.
 
-- View salary
-- View salary history
-- View PTO balance
-
-HR Dashboard
-
-- Employee management
-- Salary updates
-- Raise application tools
-
-Admin Dashboard
-
-- User management
-- Role management
-- System logs
+The dashboard uses modals for editing employee information and registering new users.
 
 ---
 
@@ -655,20 +575,20 @@ Development will follow an **iterative workflow** where features are implemented
 
 # 11. Deployment Environment
 
-The PayWay system will be deployed using the following environment:
+The PayWay system can be deployed using a standard PHP web server and a PostgreSQL database host.
 
-Application Server
+### Application Server
 
-- PHP web server (Apache or Nginx)
+- PHP 8+ (Apache, Nginx, or PHP built-in server)
 
-Database
+### Database
 
-- PostgreSQL hosted on AWS RDS
+- PostgreSQL (self-hosted or managed)
 
-Security
+### Security
 
-- HTTPS enabled
-- OAuth authentication
+- HTTPS is recommended for production deployments
+- Authentication is handled via secure PHP sessions (cookie-based)
 
 ---
 

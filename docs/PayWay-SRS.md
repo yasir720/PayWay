@@ -2,8 +2,8 @@
 
 ## Software Requirements Specification (SRS)
 
-Version: 1.0
-Author: Yasir Azizi
+Version: 1.1
+Author: Yasir Alizai
 Date: March 2026
 
 ---
@@ -12,46 +12,51 @@ Date: March 2026
 
 ## 1.1 Purpose
 
-This document describes the functional and non-functional requirements for **PayWay**, a salary management system designed to track employee compensation, manage salary adjustments, and support employee lifecycle management within an organization.
+This document describes the functional and non-functional requirements for **PayWay**, a web-based salary management system.
 
-The system will allow authorized users to manage salary records, monitor employee compensation history, and apply salary adjustments based on defined performance metrics. PayWay will enforce role-based access control and maintain audit logs for critical system actions.
+The current implementation enables authorized users to:
+
+- View employee salary information
+- Apply department-based raises
+- Track salary history
+- Enforce role-based access controls
+- Log critical actions for audit purposes
 
 ---
 
 ## 1.2 Scope
 
-PayWay is a web-based application that enables organizations to manage employee salary data and related records securely.
+PayWay is a browser-based application backed by a PHP API and a PostgreSQL database.
 
-The system will provide functionality for:
+The system provides functionality for:
 
-- Tracking employee salary information
-- Managing salary adjustments and raises
-- Recording employee hiring and termination
-- Managing paid time off (PTO) and payroll deductions
-- Enforcing role-based system permissions
-- Logging system actions for auditing and debugging purposes
+- Viewing current salaries and salary history
+- Editing employee profile information (role-restricted)
+- Applying automated, department-based salary raises
+- Managing application users (Admin role)
+- Auditing key actions via an audit log
 
-PayWay will be used primarily by employees, HR personnel, and system administrators.
+PayWay is intended for employees, HR personnel, and system administrators.
 
 ---
 
 ## 1.3 Stakeholders
 
-| Stakeholder           | Description                                                          |
-| --------------------- | -------------------------------------------------------------------- |
-| Employees             | View their personal salary and PTO information                       |
-| HR Personnel          | Manage employee records, salary adjustments, hiring, and termination |
-| System Administrators | Manage user accounts, permissions, and system configuration          |
+| Stakeholder           | Description                                                  |
+| --------------------- | ------------------------------------------------------------ |
+| Employees             | View their own salary information                            |
+| HR Personnel          | Manage employee profiles, view salary data, and apply raises |
+| System Administrators | Manage users, roles, and audit logs                          |
 
 ---
 
 # 2. System Overview
 
-PayWay is a centralized system designed to manage employee salary and compensation data. The system will allow organizations to maintain accurate records of employee salaries while supporting automated raise calculations based on performance metrics.
+PayWay is a centralized system designed to manage employee salary and compensation data. The system allows organizations to maintain accurate salary records, apply department-based salary increases, and view salary change history.
 
-The system will enforce strict security controls to protect sensitive payroll information and ensure that only authorized users can access or modify salary records.
+The system enforces role-based access controls to protect sensitive payroll information and ensure that only authorized users can access or modify salary and user records.
 
-PayWay will also maintain historical records of salary changes to ensure transparency and accountability.
+PayWay maintains an audit log of key actions to ensure transparency and accountability.
 
 ---
 
@@ -59,50 +64,42 @@ PayWay will also maintain historical records of salary changes to ensure transpa
 
 ## 3.1 Employee Salary Tracking
 
-The system shall allow authorized users to track employee salary information.
+The system shall allow authorized users to view employee salary information.
 
 Requirements:
 
 - The system shall store employee salary data in a centralized database.
-- The system shall allow users to view salary records.
-- The system shall allow salary information to be sorted and filtered by:
-    - Department
-    - Hire date
-    - Salary amount (highest to lowest)
-    - Salary amount (lowest to highest)
-- The system shall allow employees to view their own salary and salary history.
+- Employees shall be able to view their current salary.
+- HR and Admin users shall be able to view current salaries for all active employees.
+- HR and Admin users shall be able to view salary history records.
+- HR users shall only see salary history for the past 2 years.
 
 ---
 
 ## 3.2 Salary Adjustment System
 
-The system shall support salary adjustments based on performance metrics.
+The system shall support applying department-based salary raises.
 
 Requirements:
 
-- The system shall allow salary raises to be calculated using employee performance metrics.
-- The system shall support department-based salary comparisons.
-- The system shall allow HR personnel to apply raises such that:
-    - The top three employees in each department receive a **5% salary increase**
-    - All remaining employees receive a **3% salary increase**
-- The system shall store a historical record of all salary adjustments.
+- Raises shall be calculated based on current salary rankings within each department.
+- When raises are applied:
+    - The top three employees in each department receive a **5%** raise
+    - All other employees receive a **3%** raise
+- New salary records shall be inserted with the current date as the effective date.
+- A salary history entry shall be recorded for each raise application.
 
 ---
 
-## 3.3 Employee Lifecycle Management
+## 3.3 Employee Management
 
-The system shall support the management of employee hiring and termination.
+The system shall provide limited editing of employee profile information.
 
 Requirements:
 
-- The system shall allow HR personnel to add new employee records.
-- The system shall allow HR personnel to terminate employee records.
-- The system shall track:
-    - Employee hire dates
-    - Employee termination dates
-- The system shall allow HR personnel to manage payroll-related records including:
-    - Paid time off (PTO)
-    - Payroll deductions
+- HR and Admin users shall be able to update employee first name, last name, email, and department.
+- HR users shall only be able to update employee records where the hire date is within the last 3 months.
+- Employee records shall remain active unless updated outside the system.
 
 ---
 
@@ -115,8 +112,6 @@ The system shall enforce role-based permissions to protect sensitive information
 Employees shall be able to:
 
 - View their own salary information
-- View salary history
-- View PTO balances
 
 Employees shall not be permitted to modify salary or employee data.
 
@@ -126,13 +121,10 @@ Employees shall not be permitted to modify salary or employee data.
 
 HR personnel shall be able to:
 
-- View employee salary information
-- Modify salary records within the previous **three months**
-- Add new employee records
-- Terminate employee records
-- Manage PTO and deduction records
-
-HR personnel shall not be permitted to modify salary records older than three months.
+- View all employee salary information
+- View salary history (past 2 years)
+- Update employee profile information (limited to recent hires)
+- Apply department-based raises
 
 ---
 
@@ -140,23 +132,23 @@ HR personnel shall not be permitted to modify salary records older than three mo
 
 Administrators shall be able to:
 
-- Create and manage user accounts
-- Assign and modify system roles
-- Modify salary records beyond the HR modification window
-- Manage system configuration settings
+- Perform all HR actions
+- Create new user accounts
+- View audit logs
 
 ---
 
 # 4. Security Requirements
 
-The system shall protect sensitive payroll information through authentication and authorization controls.
+The system shall protect sensitive payroll information using authentication, authorization, and secure storage.
 
 Requirements:
 
-- The system shall require users to authenticate using valid credentials.
-- The system shall enforce role-based authorization for system actions.
-- The system shall require confirmation prompts before major salary changes are finalized.
-- The system shall generate alerts when unusually large salary changes occur.
+- The system shall require users to authenticate with a valid username and password.
+- Passwords shall be stored as bcrypt hashes.
+- The system shall enforce role-based authorization on all API endpoints.
+- Sessions shall expire after 2 hours and idle out after 20 minutes.
+- Sensitive actions (e.g., applying raises) shall require an authenticated session and role validation.
 
 ---
 
@@ -213,137 +205,92 @@ The system should be designed in a modular manner to allow future enhancements a
 Actor: Employee
 
 Description:
-An employee views their salary information and salary history.
+An employee views their current salary information.
 
 Steps:
 
 1. Employee logs into PayWay
 2. System authenticates the user
-3. Employee navigates to the salary dashboard
-4. System displays salary data
+3. Employee navigates to the dashboard
+4. System displays the employee's current salary
 
 ---
 
-## UC-2: View PTO Balance
+## UC-2: View All Salaries and History
 
-Actor: Employee
+Actor: HR / Administrator
+
+Description:
+An HR or Admin user views current salaries for all employees and salary history.
 
 Steps:
 
-1. Employee logs into PayWay
-2. Employee navigates to the PTO page
-3. System retrieves PTO records
-4. System displays available PTO
+1. User logs into PayWay
+2. User navigates to the dashboard
+3. System displays current salaries for all active employees
+4. System displays salary history (HR sees 2 years, Admin sees full history)
 
 ---
 
-## UC-3: Add New Employee
+## UC-3: Update Employee Profile
 
-Actor: HR
+Actor: HR / Administrator
+
+Description:
+An HR or Admin user updates an employee's profile information.
 
 Steps:
 
-1. HR logs into PayWay
-2. HR selects "Add Employee"
-3. HR enters employee information
-4. System validates the information
-5. System creates a new employee record
+1. User logs into PayWay
+2. User selects an employee from the list
+3. User updates fields (name, email, department)
+4. System validates permissions and hire date restrictions
+5. System saves the changes and logs the update
 
 ---
 
-## UC-4: Update Employee Salary
+## UC-4: Apply Department Raises
 
-Actor: HR
+Actor: HR / Administrator
+
+Description:
+An HR or Admin user applies department-based raises to all employees.
 
 Steps:
 
-1. HR searches for an employee
-2. HR enters updated salary information
-3. System verifies modification is within the allowed timeframe
-4. System requests confirmation
-5. System saves the salary update
+1. User logs into PayWay
+2. User triggers the "Apply Raises" action
+3. System calculates raises based on department salary rankings
+4. System inserts new salary records and logs history
 
 ---
 
-## UC-5: Apply Performance Raises
-
-Actor: HR
-
-Steps:
-
-1. HR selects a department
-2. System ranks employees by performance score
-3. System identifies the top three employees
-4. System applies raises:
-    - 5% increase to top three employees
-    - 3% increase to remaining employees
-5. System records salary adjustment history
-
----
-
-## UC-6: Manage User Accounts
+## UC-5: Register a New User
 
 Actor: Administrator
 
+Description:
+An administrator registers a new system user linked to an existing employee.
+
 Steps:
 
-1. Administrator logs into PayWay
-2. Administrator views system users
-3. Administrator creates, modifies, or deletes accounts
-4. System logs account changes
+1. Admin logs into PayWay
+2. Admin navigates to the user registration section
+3. Admin enters username, password, employee ID, and role
+4. System validates input and creates the user account
+5. System logs the new user creation
 
 ---
 
-# 8. User Stories
+## UC-6: View Audit Logs
 
-### Employee
+Actor: Administrator
 
-**Story 1**
+Description:
+An administrator views recent audit log entries.
 
-As an employee
-I want to view my salary history
-So that I can track changes to my compensation.
+Steps:
 
----
-
-**Story 2**
-
-As an employee
-I want to see my PTO balance
-So that I know how many days off I can take.
-
----
-
-### HR Personnel
-
-**Story 3**
-
-As an HR user
-I want to add new employees
-So that their information is stored in PayWay.
-
----
-
-**Story 4**
-
-As an HR user
-I want to update employee salaries within a limited timeframe
-So that payroll errors can be corrected.
-
----
-
-**Story 5**
-
-As an HR user
-I want to apply raises automatically
-So that salary increases are applied consistently across departments.
-
----
-
-### Administrator
-
-**Story 6**
-
-As an administrator
-I want to manage user roles
-So that the correct users have appropriate system permissions.
+1. Admin logs into PayWay
+2. Admin navigates to the audit log section
+3. System displays recent audit events

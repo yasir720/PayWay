@@ -1,7 +1,7 @@
 <?php
 /**
  * API endpoint to fetch current salaries and salary history.
- * Access is role-based.
+ * Access is restricted by user role.
  */
 
 require_once './auth/auth.php';
@@ -13,7 +13,7 @@ $role = $_SESSION['role_id'];
 $employee_id = $_SESSION['employee_id'];
 
 if ($role == 1) {
-    // Employee sees only current salary
+    // Employees can only view their current salary.
     $stmt = $pdo->prepare("
         SELECT TO_CHAR(s.salary_amount, 'FM999,999,999,990.00') AS salary_amount,
                s.effective_date,
@@ -31,10 +31,10 @@ if ($role == 1) {
 
     $result = [
         'current' => $stmt->fetchAll(PDO::FETCH_ASSOC),
-        'history' => [], // no history for employee
+        'history' => [], // No history returned for employee.
     ];
 } else {
-    // HR and Admin
+    // HR/Admin roles see all current salaries.
     $stmtCurrent = $pdo->query("
         SELECT TO_CHAR(s.salary_amount, 'FM999,999,999,990.00') AS salary_amount,
                s.effective_date,
@@ -51,9 +51,9 @@ if ($role == 1) {
 
     $current = $stmtCurrent->fetchAll(PDO::FETCH_ASSOC);
 
-    // Salary history
+    // Salary history scope depends on role.
     if ($role == 2) {
-        // HR: past 2 years only
+        // HR sees the last 2 years.
         $stmtHistory = $pdo->prepare("
             SELECT h.employee_id,
                    e.first_name,
@@ -69,7 +69,7 @@ if ($role == 1) {
         ");
         $stmtHistory->execute();
     } else {
-        // Admin: all history
+        // Admin: all history.
         $stmtHistory = $pdo->prepare("
             SELECT h.employee_id,
                    e.first_name,
